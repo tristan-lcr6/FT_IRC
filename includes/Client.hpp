@@ -11,7 +11,7 @@ class Client
 	std::string _buff;
 
   public:
-	Client(void);
+	Client(int fd);
 	Client(const Client &other);
 	Client &operator=(const Client &other);
 	~Client();
