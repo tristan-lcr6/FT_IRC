@@ -1,19 +1,19 @@
 # FT_IRC
-NAME = ft_irc
+NAME = ircserv
 NAME_ARGS = 
 BONUS_ARGS = 
 
 # Source files
 SRC_DIR = src/
-SRC_FILES = main.c
+SRC_FILES = main.cpp Server.cpp Client.cpp
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 SRC_BONUS_FILES = 
 SRC_BONUS = $(addprefix $(SRC_DIR), $(SRC_BONUS_FILES))
 
 # Object files
 OBJ_DIR = objs/
-OBJ := $(addprefix $(OBJ_DIR), $(SRC_FILES:%.c=%.o))
-OBJ_BONUS := $(addprefix $(OBJ_DIR), $(SRC_BONUS_FILES:%.c=%.o))
+OBJ := $(addprefix $(OBJ_DIR), $(SRC_FILES:%.cpp=%.o))
+OBJ_BONUS := $(addprefix $(OBJ_DIR), $(SRC_BONUS_FILES:%.cpp=%.o))
 
 # Includes and libraries
 #	Header files
@@ -57,7 +57,7 @@ $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $(OBJ) -o $@
 	@echo "$(GREEN)SUCCESS! You can now use $(BOLD)$(ITALIC)'./$@ $(NAME_ARGS)'$(DEFAULT)"
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	@mkdir -p $(OBJ_DIR)
 	@echo "$(YELLOW)Compiling $<...$(DEFAULT)"
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
