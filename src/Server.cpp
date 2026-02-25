@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 17:15:47 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:29:34 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,6 +227,7 @@ Client &Server::findClientByFd(int fd)
 	}
 	// throw(std::exception);
 	return (*(_clients.end()));
+}
 static int parse(std::string cmd)
 {
 	if (cmd.empty())
@@ -249,6 +250,7 @@ void Server::execute(Client cli)
 	int cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
-	void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin, cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
-	commands[cmdIdx](cli);
+	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin, cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
+	// commands[cmdIdx](cli);
+	return ;
 }
