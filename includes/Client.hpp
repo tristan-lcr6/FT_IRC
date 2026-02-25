@@ -21,6 +21,8 @@ class Client
 	int setFd(int fd);
 	std::string getIp() const;
 	std::string setIp(std::string ip);
+
+	void Client::addBuff(std::string data);
 	std::string getBuffer() const;
 };
 

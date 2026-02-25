@@ -6,27 +6,27 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 16:51:51 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:11:20 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
+# include "Client.hpp"
 # include <arpa/inet.h> //-> for inet_ntoa()
 # include <csignal>     //-> for signal()
-# include <cstdio>     //-> for signal()
-# include <fcntl.h>     //-> for fcntl()
-# include <iostream>
-# include <cstring>
+# include <cstdio>      //-> for signal()
 # include <cstdlib>
+# include <cstring>
+# include <fcntl.h> //-> for fcntl()
+# include <iostream>
 # include <netinet/in.h> //-> for sockaddr_in
 # include <poll.h>       //-> for poll()
 # include <sys/socket.h> //-> for socket()
 # include <sys/types.h>  //-> for socket()
 # include <unistd.h>     //-> for close()
 # include <vector>       //-> for vector
-# include "Client.hpp"
 
 # define BLACK "\033[90m"
 # define RED "\033[91m"
@@ -39,29 +39,35 @@
 
 class Server
 {
-	private:
-		int _port;
-		int _serSocketFd;
-		static bool _signal;
-		std::string _password;
-		std::vector<Client> _clients;
-		std::vector<struct pollfd> _fds;
-	public:
-		Server(void);
-		Server(const Server& other);
-		Server &operator=(const Server &other);
-		~Server();
+  private:
+	int _port;
+	int _serSocketFd;
+	static bool _signal;
+	std::string _password;
+	std::vector<Client> _clients;
+	std::vector<struct pollfd> _fds;
 
-		void serverInit();
-		void serSocket();
-		void acceptNewClient();
-		void receiveNewData(int fd);
+  public:
+	Server(void);
+	Server(const Server &other);
+	Server &operator=(const Server &other);
+	~Server();
 
-		static void signalHandler(int signum);
+	void serverInit();
+	void serSocket();
+	void acceptNewClient();
+	void receiveNewData(int fd);
+	void addToBuff(std::string data, Client &myClient);
 
-		void setPort(int port);
-		void setPassword(std::string pswd);
+	static void signalHandler(int signum);
 
+	void setPort(int port);
+	void setPassword(std::string pswd);
+
+	void closeFds();
+	void clearClient(int fd);
+
+	Client &findClientByFd(int fd);
 		void execute(Client cli);
 
 		void closeFds();
