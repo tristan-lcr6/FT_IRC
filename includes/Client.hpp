@@ -24,6 +24,8 @@ class Client
 
 	void addBuff(std::string data);
 	std::string getBuffer() const;
+	std::string setBuffer(std::string str);
+	void clearBuffer();
 };
 
 #endif

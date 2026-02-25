@@ -7,13 +7,13 @@ Client::Client()
 
 Client::Client(int fd) : _fd(fd)
 {
-	std::cout << "Client constructor called" << std::endl;
+	// std::cout << "Client constructor called" << std::endl;
 	return ;
 }
 
 Client::Client(const Client &other)
 {
-	std::cout << "Copy constructor called" << std::endl;
+	// std::cout << "Copy constructor called" << std::endl;
 	if (this != &other)
 		*this = other;
 	return ;
@@ -21,7 +21,7 @@ Client::Client(const Client &other)
 
 Client &Client::operator=(const Client &other)
 {
-	std::cout << "Assignment operator called" << std::endl;
+	// std::cout << "Assignment operator called" << std::endl;
 	if (this != &other)
 	{
 		this->_fd = other.getFd();
@@ -31,7 +31,7 @@ Client &Client::operator=(const Client &other)
 
 Client::~Client(void)
 {
-	std::cout << "Destructor called" << std::endl;
+	// std::cout << "Destructor called" << std::endl;
 	return ;
 }
 
@@ -62,4 +62,15 @@ void Client::addBuff(std::string data)
 std::string Client::getBuffer(void) const
 {
 	return (this->_buff);
+}
+
+std::string Client::setBuffer(std::string str)
+{
+	this->_buff = str;
+	return (_buff);
+}
+
+void Client::clearBuffer()
+{
+	this->_buff.clear();
 }
