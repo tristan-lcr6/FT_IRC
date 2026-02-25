@@ -7,7 +7,7 @@ class Client
 {
   private:
 	int _fd;
-	std::string _nickname;
+	std::string _nickName;
 	std::string _IP;
 	std::string _buff;
 
@@ -17,10 +17,10 @@ class Client
 	Client(const Client &other);
 	Client &operator=(const Client &other);
 	~Client();
-	int GetFd() const;
-	int SetFd(int fd);
-	std::string GetIp() const;
-	std::string SetIp(std::string ip);
+	int getFd() const;
+	int setFd(int fd);
+	std::string getIp() const;
+	std::string setIp(std::string ip);
 
 };
 

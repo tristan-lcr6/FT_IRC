@@ -24,7 +24,7 @@ Client &Client::operator=(const Client &other)
 	std::cout << "Assignment operator called" << std::endl;
 	if (this != &other)
 	{
-		this->_fd = other.GetFd();
+		this->_fd = other.getFd();
 	}
 	return (*this);
 }
@@ -35,22 +35,22 @@ Client::~Client(void)
 	return ;
 }
 
-int Client::GetFd() const
+int Client::getFd() const
 {
 	return (this->_fd);
 }
 
-int	Client::SetFd(int fd)
+int	Client::setFd(int fd)
 {
 	return (this->_fd = fd);
 }
 
-std::string Client::GetIp(void) const
+std::string Client::getIp(void) const
 {
 	return (this->_IP);
 }
 
-std::string Client::SetIp(std::string str)
+std::string Client::setIp(std::string str)
 {
 	return (this->_IP = str);
 }

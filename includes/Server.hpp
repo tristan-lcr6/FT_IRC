@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/25 15:07:49 by jferrand         ###   ########.fr       */
@@ -19,6 +19,7 @@
 # include <fcntl.h>     //-> for fcntl()
 # include <iostream>
 # include <cstring>
+# include <cstdlib>
 # include <netinet/in.h> //-> for sockaddr_in
 # include <poll.h>       //-> for poll()
 # include <sys/socket.h> //-> for socket()
