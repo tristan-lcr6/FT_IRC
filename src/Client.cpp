@@ -54,3 +54,8 @@ std::string Client::setIp(std::string str)
 {
 	return (this->_IP = str);
 }
+
+std::string Client::getBuffer(void) const
+{
+	return (this->_buff);
+}
