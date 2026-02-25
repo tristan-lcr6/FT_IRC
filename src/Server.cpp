@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 13:07:28 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 13:19:17 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void Server::ClearClient(int fd)
 	}
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-		if (clients[i].GetFd() == fd)
+		if (clients[i].getFd() == fd)
 		{
 			clients.erase(clients.begin() + i);
 			break ;
@@ -45,8 +45,8 @@ void Server::CloseFds()
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-		std::cout << RED << "Client <" << clients[i].GetFd() << "> Disconnected" << END << std::endl;
-		close(clients[i].GetFd());
+		std::cout << RED << "Client <" << clients[i].getFd() << "> Disconnected" << END << std::endl;
+		close(clients[i].getFd());
 	}
 	if (SerSocketFd != -1)
 	{
@@ -128,8 +128,8 @@ void Server::AcceptNewClient()
 	NewPoll.fd = incofd;
 	NewPoll.events = POLLIN;
 	NewPoll.revents = 0;
-	cli.SetFd(incofd);
-	cli.SetIp(inet_ntoa((cliadd.sin_addr)));
+	cli.setFd(incofd);
+	cli.setIp(inet_ntoa((cliadd.sin_addr)));
 	clients.push_back(cli); 
 	fds.push_back(NewPoll);
 	std::cout << GREEN << "Client <" << incofd << "> Connected" << END << std::endl;
