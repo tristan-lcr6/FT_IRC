@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 18:38:52 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 18:48:07 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,3 +271,18 @@ void Server::execute(Client cli)
 		// commands[cmdIdx](cli);
 	return ;
 }
+
+void Server::cmdJoin(Client cli)
+{}
+
+void Server::cmdMode(Client cli)
+{}
+
+void Server::cmdKick(Client cli)
+{}
+
+void Server::cmdInvite(Client cli)
+{}
+
+void Server::cmdTopic(Client cli)
+{}
