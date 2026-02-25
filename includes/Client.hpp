@@ -22,7 +22,7 @@ class Client
 	std::string getIp() const;
 	std::string setIp(std::string ip);
 
-	void Client::addBuff(std::string data);
+	void addBuff(std::string data);
 	std::string getBuffer() const;
 };
 
