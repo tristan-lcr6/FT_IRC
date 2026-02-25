@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 17:45:10 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 18:28:21 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,6 +262,11 @@ void Server::execute(Client cli)
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
 	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
 	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
-	// commands[cmdIdx](cli);
+	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
+		return ; //! frerot faut mettre un mdp
+	else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
+		return ; //! frerot log toi
+	else
+		// commands[cmdIdx](cli);
 	return ;
 }
