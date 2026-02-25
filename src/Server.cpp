@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 12:49:53 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/25 13:07:28 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void Server::AcceptNewClient()
 	NewPoll.events = POLLIN;
 	NewPoll.revents = 0;
 	cli.SetFd(incofd);
-	cli.setIpAdd(inet_ntoa((cliadd.sin_addr)));
+	cli.SetIp(inet_ntoa((cliadd.sin_addr)));
 	clients.push_back(cli); 
 	fds.push_back(NewPoll);
 	std::cout << GREEN << "Client <" << incofd << "> Connected" << END << std::endl;
