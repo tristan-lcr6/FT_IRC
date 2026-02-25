@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 17:12:04 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:15:47 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,9 +195,10 @@ void Server::receiveNewData(int fd)
 	{
 		buff[bytes] = '\0';
 		std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
-		addToBuff(buff, myClient);
-		if(buff,find())
-		
+		std::string myStr = buff;
+		addToBuff(myStr, myClient);
+		if (myStr.find("/r/n"))
+			execute(myClient);
 	}
 }
 
