@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 15:29:46 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/25 15:58:30 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ Server &Server::operator=(const Server &other)
 Server::~Server(void)
 {
     // std::cout << "Destructor called" << std::endl;
-	this->closeFds();
     return ;
 }
 
@@ -165,7 +164,7 @@ void Server::acceptNewClient()
 	NewPoll.events = POLLIN;
 	NewPoll.revents = 0;
 	cli.setFd(incofd);
-	cli.setIpAdd(inet_ntoa((cliadd.sin_addr)));
+	cli.setIp(inet_ntoa(cliadd.sin_addr));
 	this->_clients.push_back(cli); 
 	this->_fds.push_back(NewPoll);
 	std::cout << GREEN << "Client <" << incofd << "> Connected" << END << std::endl;

@@ -1,6 +1,6 @@
 # FT_IRC
 NAME = ircserv
-NAME_ARGS = 
+NAME_ARGS = <port> <password>
 BONUS_ARGS = 
 
 # Source files
