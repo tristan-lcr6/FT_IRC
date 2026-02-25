@@ -1,32 +1,56 @@
 #include "Client.hpp"
 
-// Default constructor
-Client::Client(void)
+Client::Client()
 {
-    std::cout << "Default constructor called" << std::endl;
-    return ;
+	return ;
 }
 
-// Copy constructor
+Client::Client(int fd) : _fd(fd)
+{
+	std::cout << "Client constructor called" << std::endl;
+	return ;
+}
+
 Client::Client(const Client &other)
 {
-    std::cout << "Copy constructor called" << std::endl;
-    (void) other;
-    return ;
+	std::cout << "Copy constructor called" << std::endl;
+	if (this != &other)
+		*this = other;
+	return ;
 }
 
-// Assignment operator overload
 Client &Client::operator=(const Client &other)
 {
-    std::cout << "Assignment operator called" << std::endl;
-    (void) other;
-    return (*this);
+	std::cout << "Assignment operator called" << std::endl;
+	if (this != &other)
+	{
+		this->_fd = other.GetFd();
+	}
+	return (*this);
 }
 
-// Destructor
 Client::~Client(void)
 {
-    std::cout << "Destructor called" << std::endl;
-    return ;
+	std::cout << "Destructor called" << std::endl;
+	return ;
 }
 
+int Client::GetFd() const
+{
+	return (this->_fd);
+}
+
+int	Client::SetFd(int fd)
+{
+	return (this->_fd = fd);
+}
+
+std::string Client::GetIp(void) const
+{
+	return (this->_IP);
+}
+
+std::string Client::SetIp(std::string str)
+{
+	return (this->_IP = str);
+}
