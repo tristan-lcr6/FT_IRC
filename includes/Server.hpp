@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 15:10:58 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 15:07:49 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,26 +37,33 @@
 # define CYAN "\033[96m"
 # define END "\033[0m"
 
-class Server //-> class for server
+class Server
 {
 	private:
-		int Port; //-> server port
-		int SerSocketFd; //-> server socket file descriptor
-		static bool Signal; //-> static boolean for signal
-		std::vector<Client> clients; //-> vector of clients
-		std::vector<struct pollfd> fds; //-> vector of pollfd
+		int _port;
+		int _serSocketFd;
+		static bool _signal;
+		std::string _password;
+		std::vector<Client> _clients;
+		std::vector<struct pollfd> _fds;
 	public:
-		Server(){SerSocketFd = -1;} //-> default constructor
+		Server(void);
+		Server(const Server& other);
+		Server &operator=(const Server &other);
+		~Server();
 
-		void ServerInit(); //-> server initialization
-		void SerSocket(); //-> server socket creation
-		void AcceptNewClient(); //-> accept new client
-		void ReceiveNewData(int fd); //-> receive new data from a registered client
+		void serverInit();
+		void serSocket();
+		void acceptNewClient();
+		void receiveNewData(int fd);
 
-		static void SignalHandler(int signum); //-> signal handler
-	
-		void CloseFds(); //-> close file descriptors
-		void ClearClient(int fd); //-> clear clients
+		static void signalHandler(int signum);
+
+		void setPort(int port);
+		void setPassword(std::string pswd);
+
+		void closeFds();
+		void clearClient(int fd);
 };
 
 #endif

@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:35 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/25 15:14:08 by tlecuyer         ###   ########.fr       */
