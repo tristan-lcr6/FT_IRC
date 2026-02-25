@@ -1,11 +1,11 @@
 #include "Client.hpp"
 
-Client::Client()
+Client::Client() : _authStatus(0)
 {
 	return ;
 }
 
-Client::Client(int fd) : _fd(fd)
+Client::Client(int fd) : _fd(fd), _authStatus(0)
 {
 	// std::cout << "Client constructor called" << std::endl;
 	return ;
@@ -73,4 +73,9 @@ std::string Client::setBuffer(std::string str)
 void Client::clearBuffer()
 {
 	this->_buff.clear();
+}
+
+int Client::getAuthStatus()
+{
+	return (this->_authStatus);
 }

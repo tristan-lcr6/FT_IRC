@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 17:45:10 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 18:05:10 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,7 +260,8 @@ void Server::execute(Client cli)
 	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
-	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
+	// 
+	//void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
 	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
 	// commands[cmdIdx](cli);
 	return ;

@@ -7,7 +7,9 @@ class Client
 {
   private:
 	int _fd;
+	int _authStatus;
 	std::string _nickName;
+	std::string _userName;
 	std::string _IP;
 	std::string _buff;
 
@@ -26,6 +28,7 @@ class Client
 	std::string getBuffer() const;
 	std::string setBuffer(std::string str);
 	void clearBuffer();
+	int getAuthStatus();
 };
 
 #endif
