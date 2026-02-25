@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 17:29:34 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 17:45:10 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,9 +196,14 @@ void Server::receiveNewData(int fd)
 		buff[bytes] = '\0';
 		std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
 		std::string myStr = buff;
-		addToBuff(myStr, myClient);
+		// addToBuff(myStr, myClient);
+		myClient.addBuff(myStr);
 		if (myStr.find("/r/n"))
+		{
 			execute(myClient);
+			myClient.clearBuffer();
+		}
+		// std::cout << myClient.getBuffer() << std::endl;
 	}
 }
 
@@ -228,8 +233,10 @@ Client &Server::findClientByFd(int fd)
 	// throw(std::exception);
 	return (*(_clients.end()));
 }
-static int parse(std::string cmd)
+static int	parse(std::string cmd)
 {
+	size_t	i;
+
 	if (cmd.empty())
 		return (-1);
 	std::string name;
@@ -238,19 +245,23 @@ static int parse(std::string cmd)
 		name = cmd.substr(0, name_end);
 	else
 		name = cmd;
-	std::string commands[9] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "MODE", "KICK", "INVITE", "TOPIC"};
-	size_t i = 0;
+	std::string commands[9] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG",
+		"MODE", "KICK", "INVITE", "TOPIC"};
+	i = 0;
 	while (i < 9 && name != commands[i])
 		++i;
-	return i;
+	return (i);
 }
 
 void Server::execute(Client cli)
 {
-	int cmdIdx = parse(cli.getBuffer());
+	int	cmdIdx;
+
+	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
-	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin, cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
+	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
+	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
 	// commands[cmdIdx](cli);
 	return ;
 }
