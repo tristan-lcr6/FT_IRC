@@ -227,4 +227,28 @@ Client &Server::findClientByFd(int fd)
 	}
 	// throw(std::exception);
 	return (*(_clients.end()));
+static int parse(std::string cmd)
+{
+	if (cmd.empty())
+		return (-1);
+	std::string name;
+	std::size_t name_end = cmd.find_first_of(' ');
+	if (name_end != std::string::npos)
+		name = cmd.substr(0, name_end);
+	else
+		name = cmd;
+	std::string commands[9] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG", "MODE", "KICK", "INVITE", "TOPIC"};
+	size_t i = 0;
+	while (i < 9 && name != commands[i])
+		++i;
+	return i;
+}
+
+void Server::execute(Client cli)
+{
+	int cmdIdx = parse(cli.getBuffer());
+	if (cmdIdx < 0 || cmdIdx > 8)
+		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
+	void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin, cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
+	commands[cmdIdx](cli);
 }

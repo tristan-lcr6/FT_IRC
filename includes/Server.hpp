@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/25 17:11:20 by tlecuyer         ###   ########.fr       */
@@ -68,6 +68,10 @@ class Server
 	void clearClient(int fd);
 
 	Client &findClientByFd(int fd);
+		void execute(Client cli);
+
+		void closeFds();
+		void clearClient(int fd);
 };
 
 #endif

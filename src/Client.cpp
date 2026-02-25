@@ -59,3 +59,7 @@ void Client::addBuff(std::string data)
 {
 	this->_buff += data;
 }
+std::string Client::getBuffer(void) const
+{
+	return (this->_buff);
+}
