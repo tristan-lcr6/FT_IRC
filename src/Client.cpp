@@ -40,7 +40,7 @@ int Client::getFd() const
 	return (this->_fd);
 }
 
-int	Client::setFd(int fd)
+int Client::setFd(int fd)
 {
 	return (this->_fd = fd);
 }
@@ -53,4 +53,9 @@ std::string Client::getIp(void) const
 std::string Client::setIp(std::string str)
 {
 	return (this->_IP = str);
+}
+
+void Client::addBuff(std::string data)
+{
+	this->_buff += data;
 }
