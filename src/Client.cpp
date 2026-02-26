@@ -79,3 +79,10 @@ int Client::getAuthStatus()
 {
 	return (this->_authStatus);
 }
+
+bool Client::operator==(const Client &c)
+{
+	if (this->_fd == c._fd)
+		return true;
+	return false;
+}

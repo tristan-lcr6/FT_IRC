@@ -29,6 +29,7 @@ class Client
 	std::string setBuffer(std::string str);
 	void clearBuffer();
 	int getAuthStatus();
+	bool operator==(const Client &c);
 };
 
 #endif

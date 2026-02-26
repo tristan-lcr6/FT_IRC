@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 18:48:07 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/26 11:09:50 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,17 +272,35 @@ void Server::execute(Client cli)
 	return ;
 }
 
+// JOIN #a,#b,#c passA,passB,passC
+// If the channel exists and can join, joins it
+// If it doesn't exist create it
 void Server::cmdJoin(Client cli)
 {}
 
+// MODE <channel> <modes> [params]
+// MODE #test +i
+// MODE #test +k secret
+// MODE #test +o jesus
+// MODE #test +l 10
+// MODE #test -k
+// Verifies that cli is an operator then executes the asked action
 void Server::cmdMode(Client cli)
 {}
 
+// KICK <channel> <nick> [:reason]
+// KICK #test john :spamming
 void Server::cmdKick(Client cli)
 {}
 
+// INVITE <nick> <channel>
+// si le channel est invite-only seulement un operateur peut inviter
 void Server::cmdInvite(Client cli)
 {}
 
+// TOPIC <channel> [:topic]
+// TOPIC #test -> affiche le topic
+// TOPIC #test :New topic -> change le topic
+// si channel +t alors le changement est op-only
 void Server::cmdTopic(Client cli)
 {}
