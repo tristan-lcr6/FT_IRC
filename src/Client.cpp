@@ -55,6 +55,11 @@ std::string Client::setIp(std::string str)
 	return (this->_IP = str);
 }
 
+const std::string &Client::getNickname(void) const
+{
+	return this->_nickName;
+}
+
 void Client::addBuff(std::string data)
 {
 	this->_buff += data;
