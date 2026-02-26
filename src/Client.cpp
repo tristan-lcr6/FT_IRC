@@ -86,3 +86,13 @@ bool Client::operator==(const Client &c)
 		return true;
 	return false;
 }
+
+int Client::setGrade(int i)
+{
+	this->_authStatus = i;
+}
+
+void Client::setNickName(std::string name)
+{
+	this->_nickName = name;
+}

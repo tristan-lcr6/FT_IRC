@@ -260,8 +260,8 @@ void Server::execute(Client cli)
 	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
-	// 
-	//void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
+	//
+	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
 	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
 		return ; //! frerot faut mettre un mdp
@@ -269,7 +269,61 @@ void Server::execute(Client cli)
 		return ; //! frerot log toi
 	else
 		// commands[cmdIdx](cli);
-	return ;
+		return ;
+}
+
+int Server::cmdPass(Client &myClient)
+{
+	std::string arg;
+	std::size_t name_end = (myClient.getBuffer()).find_first_of(' ');
+	if (name_end == myClient.getBuffer().size())
+		return (0);
+	arg = (myClient.getBuffer()).substr(name_end);
+	if (arg == _password)
+		myClient.setGrade(1);
+	else
+	{
+		std::cout << "Error :wrong Password." << std::endl;
+		return (1);
+	}
+	return (0);
+}
+int	cmdNick(Client &myClient)
+{
+	std::string arg;
+	std::size_t name_end = (myClient.getBuffer()).find_first_of(' ');
+	if (name_end == myClient.getBuffer().size())
+		return (0);
+	arg = (myClient.getBuffer()).substr(name_end);
+	if (isValidString(arg))
+		myClient.setNickName(arg);
+	else
+	{
+		std::cout << "Error :wrong Nickame." << std::endl;
+		return (1);
+	}
+	return (0);
+}
+int	cmdUser(Client &myClient)
+{
+}
+
+bool isValidString(const std::string& str)
+{
+    if (str.empty())
+        return false;
+
+    for (size_t i = 0; i < str.length(); ++i) {
+        char c = str[i];
+        
+        if (!((c >= 'a' && c <= 'z') || 
+              (c >= 'A' && c <= 'Z') || 
+              (c >= '0' && c <= '9') || 
+              c == '_')) {
+            return false;
+        }
+    }
+    return true;
 }
 
 // JOIN #a,#b,#c passA,passB,passC

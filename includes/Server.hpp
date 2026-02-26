@@ -6,6 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
+/*   Updated: 2026/02/25 18:59:15 by tlecuyer         ###   ########.fr       */
 /*   Updated: 2026/02/25 18:50:47 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -69,9 +70,11 @@ class Server
 	void closeFds();
 	void clearClient(int fd);
 
-
 	Client &findClientByFd(int fd);
 	void execute(Client cli);
+	int cmdPass(Client &myClient);
+	int cmdNick(Client &myClient);
+	int cmdUser(Client &myClient);
 	void cmdJoin(Client cli);
 	void cmdMode(Client cli);
 	void cmdKick(Client cli);

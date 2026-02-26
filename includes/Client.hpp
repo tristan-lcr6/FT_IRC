@@ -30,6 +30,8 @@ class Client
 	void clearBuffer();
 	int getAuthStatus();
 	bool operator==(const Client &c);
+	int setGrade(int i);
+	void setNickName(std::string name);
 };
 
 #endif
