@@ -27,11 +27,15 @@ class Client
 	void addBuff(std::string data);
 	std::string getBuffer() const;
 	std::string setBuffer(std::string str);
+	// void eraseBuffer(size_t start, size_t size);
 	void clearBuffer();
 	int getAuthStatus();
 	bool operator==(const Client &c);
 	int setGrade(int i);
 	void setNickName(std::string name);
+	std::string Client::getNickName()const;
+
+
 };
 
 #endif
