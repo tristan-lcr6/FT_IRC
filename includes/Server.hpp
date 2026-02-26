@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/26 12:10:11 by jferrand         ###   ########.fr       */
@@ -14,9 +14,9 @@
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
-# include "Client.hpp"
 # include "Channel.hpp"
 # include "utils.hpp"
+# include "Client.hpp"
 # include <arpa/inet.h> //-> for inet_ntoa()
 # include <csignal>     //-> for signal()
 # include <cstdio>      //-> for signal()
@@ -73,6 +73,8 @@ class Server
 
 	Client &findClientByFd(int fd);
 	void execute(Client &cli);
+	int findNickName(std::string nickName);
+	void execute(Client cli);
 	int cmdPass(Client &myClient);
 	int cmdNick(Client &myClient);
 	int cmdUser(Client &myClient);
@@ -83,4 +85,5 @@ class Server
 	void cmdTopic(Client &cli);
 };
 
+std::vector<std::string> split(std::string s, std::string delimiter);
 #endif

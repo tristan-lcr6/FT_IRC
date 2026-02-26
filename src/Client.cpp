@@ -101,3 +101,8 @@ void Client::setNickName(std::string name)
 {
 	this->_nickName = name;
 }
+
+std::string Client::getNickName() const
+{
+	return (_nickName);
+}
