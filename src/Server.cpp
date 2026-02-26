@@ -6,10 +6,10 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 16:03:27 by tlecuyer         ###   ########.fr       */
-/*   Updated: 2026/02/26 16:02:33 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/26 17:07:53 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Server.hpp"
 
@@ -206,7 +206,10 @@ void Server::receiveNewData(int fd)
 			end_start = (*myClient).getBuffer().find_first_of("\r\n");
 			(*myClient).setBuffer((*myClient).getBuffer().erase(end_start,
 					(*myClient).getBuffer().size()));
-			execute(*myClient);
+			if(!myClient)
+				std::cout << RED << "Client lost" << END << std::endl;				
+			else 
+				execute(*myClient);
 			(*myClient).clearBuffer();
 		}
 		// std::cout << myClient.getBuffer() << std::endl;
@@ -263,15 +266,15 @@ void Server::execute(Client &cli)
 {
 	int	cmdIdx;
 
-	int (Server::*commands[])(Client &) = {&Server::cmdPass, &Server::cmdNick,
-		&Server::cmdUser};
-	// cmdJoin,
-	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic
+	void (Server::*commands[])(Client &) = {&Server::cmdPass, &Server::cmdNick,
+		&Server::cmdUser, &Server::cmdJoin, &Server::cmdPrivMsg, &Server::cmdMode, &Server::cmdKick, &Server::cmdInvite, &Server::cmdTopic};
+	
 	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 	{
 		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
+	}
 	(this->*commands[cmdIdx])(cli);
 	return ;
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
@@ -287,15 +290,16 @@ void Server::execute(Client &cli)
 	else
 		// commands[cmdIdx](cli);
 		return ;
-}
+	}
 
-int Server::cmdPass(Client &myClient)
+
+void Server::cmdPass(Client &myClient)
 {
 	std::cout << myClient << std::endl;
 	std::string passWord;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size())
-		return (0);
+		return ;
 	passWord = (myClient.getBuffer()).substr(nameStart + 1);
 	//?be more specifiques on the spaces rules for password
 	std::cout << "passWord is'" << passWord << "'" << std::endl;
@@ -305,33 +309,31 @@ int Server::cmdPass(Client &myClient)
 		std::cout << myClient << std::endl;
 	}
 	else
-	{
 		std::cout << "Error :wrong Password." << std::endl;
-		return (1);
-	}
-	return (0);
 }
-int Server::cmdNick(Client &myClient)
+
+void Server::cmdNick(Client &myClient)
 {
 				std::cout << myClient << std::endl;
 	std::string nickname;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size()
 		|| nameStart == std::string::npos)
-		return (0);
+		return ;
 	nickname = (myClient.getBuffer()).substr(nameStart + 1);
 	if (isValidString(nickname))
 	{
 		if (!findNickName(nickname))
-			return (myClient.setNickName(nickname),
-				std::cout << myClient << std::endl, 0);
-		return (std::cout << "Error : Nickame already used." << std::endl, 1);
+		{
+			myClient.setNickName(nickname);
+				std::cout << myClient << std::endl;
+		}
+		std::cout << "Error : Nickame already used." << std::endl;
 	}
 	else
-		return (std::cout << "Error :Not a valid Nickame." << std::endl, 1);
-	return (0);
+		std::cout << "Error :Not a valid Nickame." << std::endl;
 }
-int Server::cmdUser(Client &myClient)
+void Server::cmdUser(Client &myClient)
 {
 	std::string realname;
 	std::string cpy = myClient.getBuffer();
@@ -344,9 +346,9 @@ int Server::cmdUser(Client &myClient)
 	tokens = split(cpy, " ");
 	std::cout << tokens << std::endl;
 	std::cout << "realname is :" << realname << "." << std::endl;
-	if (tokens.size() != 3)
-		return (std::cout << "Error :Not a valid User entry." << std::endl, 1);
-	return (0);
+	if (tokens.size() != 4)
+		std::cout << "Error :Not a valid User entry." << std::endl;
+	myClient.setGrade(2);
 }
 
 bool	isValidString(const std::string &str)
@@ -394,7 +396,10 @@ void Server::cmdJoin(Client &cli)
 			}
 		}
 		if (!found)
+		{
 			this->_channels.push_back(Channel(cli, name));
+			std::cout << "Channel " << name << " created" << std::endl;
+		}
 	}
 }
 
@@ -409,6 +414,7 @@ void Server::cmdMode(Client &cli)
 {
 	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
 	std::string channel_name = tokens[1];
+	std::cout << "Moding " << channel_name << " channel" << std::endl;
 	bool found = false;
 	Channel *channel;
 	for (std::size_t i = 0; i < this->_channels.size(); i++)
@@ -428,7 +434,7 @@ void Server::cmdMode(Client &cli)
 	std::string modestring = tokens[2];
 	std::vector<std::string> params;
 	if (tokens.size() > 3)
-		params = split(tokens[3], ' ');
+		params.assign(tokens.begin() + 3, tokens.end());;
 	std::size_t paramIdx = 0;
 	bool add = true;
 	for (size_t i = 0; i < modestring.size(); ++i)
@@ -461,20 +467,31 @@ void Server::cmdMode(Client &cli)
 // KICK <channel> <nick> [:reason]
 // KICK #test john :spamming
 void Server::cmdKick(Client &cli)
-{}
+{
+	(void)cli;
+}
+
+void Server::cmdPrivMsg(Client &cli)
+{
+	(void)cli;
+}
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
 void Server::cmdInvite(Client &cli)
-{}
+{
+	(void)cli;
+	std::cout << this->_channels[0] << std::endl;
+}
 
 // TOPIC <channel> [:topic]
 // TOPIC #test -> affiche le topic
 // TOPIC #test :New topic -> change le topic
 // si channel +t alors le changement est op-only
-// void Server::cmdTopic(Client cli)
-// {
-// }
+void Server::cmdTopic(Client &cli)
+{
+	(void)cli;
+}
 
 int Server::findNickName(std::string nickName)
 {

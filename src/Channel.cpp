@@ -78,18 +78,12 @@ bool Channel::isLimited(void) const
 
 void Channel::setInviteOnly(bool b)
 {
-	b += 1;//!
-
-	if (this->_i_mode)
-		return ;
-	this->_invite_list.clear();
-	this->_i_mode = true;
+	this->_i_mode = b;
 }
 
 void Channel::setTopicOpOnly(bool b)
 {
-	b += 1 ;//!
-	this->_t_mode = true;
+	this->_t_mode = b;
 }
 
 void Channel::setClientLimit(int limit)
@@ -100,20 +94,18 @@ void Channel::setClientLimit(int limit)
 
 void Channel::setClientLimit(std::string limit_str)
 {
-	int limit;
 	char *end;
-	long l = std::strtol(limit_str.c_str(), &end, 10);
-	if (end != '\0' || l < 1 || l > std::numeric_limits<int>::max())
+	size_t l = std::strtol(limit_str.c_str(), &end, 10);
+	if (*end != '\0' || l < 1 )
 	{
 		std::cerr << "Invalid client limit" << std::endl;
 		return ; //! error invalid input
 	}
-	this->setClientLimit(limit);
+	this->setClientLimit(l);
 }
 
 void Channel::removeClientLimit()
 {
-	limit++;//!
 	this->_l_mode = false;
 }
 
@@ -303,4 +295,31 @@ void Channel::applyMode(char c, bool add, std::string param)
 		//! error unknown mode
 		break;
 	}
+}
+
+
+std::ostream &operator<<(std::ostream &os, const Channel &channel) {
+    os << "--- Channel: " << channel.getName() << " ---" << std::endl;
+    os << "Topic: " << (channel.getTopic().empty() ? "(aucun)" : channel.getTopic()) << std::endl;
+    
+    // Affichage des modes actifs
+    os << "Modes: [";
+    if (channel.isInviteOnly()) os << "i";
+    if (channel.isTopicOpOnly()) os << "t";
+    if (channel.hasKey())        os << "k";
+    if (channel.isLimited())     os << "l";
+    os << "]" << std::endl;
+
+    // Détails des limites et clés
+    if (channel.isLimited()) {
+        // Note: Il te faudra peut-être un getter getClientLimit() 
+        // ou accéder à _client_limit si tu mets cette fonction en 'friend'
+        os << "Limit: " << "activée" << std::endl; 
+    }
+    
+    // On peut aussi afficher le nombre de clients présents
+    // os << "Clients connectés: " << channel.getClients().size() << std::endl;
+
+    os << "---------------------------";
+    return os;
 }

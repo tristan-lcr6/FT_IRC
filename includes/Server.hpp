@@ -6,10 +6,10 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 12:53:47 by tlecuyer         ###   ########.fr       */
-/*   Updated: 2026/02/26 12:10:11 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/26 16:41:32 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 
 #ifndef SERVER_HPP
@@ -75,15 +75,16 @@ class Server
 	Client &findClientByFd(int fd);
 	void execute(Client &cli);
 	int findNickName(std::string nickName);
-	void execute(Client &cli);
-	int cmdPass(Client &myClient);
-	int cmdNick(Client &myClient);
-	int cmdUser(Client &myClient);
+	void cmdPass(Client &myClient);
+	void cmdNick(Client &myClient);
+	void cmdUser(Client &myClient);
 	void cmdJoin(Client &cli);
 	void cmdMode(Client &cli);
 	void cmdKick(Client &cli);
 	void cmdInvite(Client &cli);
 	void cmdTopic(Client &cli);
+	void cmdPrivMsg(Client &cli);
+
 };
 
 bool	isValidString(const std::string &str);
