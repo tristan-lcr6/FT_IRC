@@ -29,6 +29,8 @@ class Client
 	std::string setBuffer(std::string str);
 	void clearBuffer();
 	int getAuthStatus();
+	int setGrade(int i);
+	void setNickName(std::string name);
 };
 
 #endif

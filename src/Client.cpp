@@ -79,3 +79,13 @@ int Client::getAuthStatus()
 {
 	return (this->_authStatus);
 }
+
+int Client::setGrade(int i)
+{
+	this->_authStatus = i;
+}
+
+void Client::setNickName(std::string name)
+{
+	this->_nickName = name;
+}
