@@ -76,7 +76,7 @@ bool Channel::isLimited(void) const
 
 void Channel::setInviteOnly(bool b)
 {
-	b = 0;//!
+	b += 1;//!
 
 	if (this->_i_mode)
 		return ;
@@ -86,7 +86,7 @@ void Channel::setInviteOnly(bool b)
 
 void Channel::setTopicOpOnly(bool b)
 {
-	b = 0;//!
+	b += 1 ;//!
 	this->_t_mode = true;
 }
 

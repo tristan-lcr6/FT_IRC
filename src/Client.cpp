@@ -25,6 +25,10 @@ Client &Client::operator=(const Client &other)
 	if (this != &other)
 	{
 		this->_fd = other.getFd();
+		this->_authStatus = other.getAuthStatus();
+		this->_nickName = other.getNickName();
+		this->_userName = other.getUserName();
+
 	}
 	return (*this);
 }
@@ -101,6 +105,13 @@ std::string Client::getNickName() const
 {
 	return (_nickName);
 }
+
+std::string Client::getUserName() const
+{
+	return (_userName);
+}
+
+
 
 
 std::ostream &operator<<(std::ostream &os, const Client &c)

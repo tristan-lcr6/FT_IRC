@@ -2,6 +2,8 @@
 # define CLIENT_HPP
 
 # include <iostream>
+# include <vector>
+
 
 class Client
 {
@@ -32,10 +34,13 @@ class Client
 	int getAuthStatus() const;
 	std::string getIp() const;
 	std::string getNickName() const;
+	std::string getUserName() const;
 	std::string getBuffer() const;
 	int getFd() const;
 };
 
 std::ostream &operator<<(std::ostream &os, const Client &c);
+
+std::ostream& operator<<(std::ostream& dataStream, const std::vector<std::string>& vector);
 
 #endif

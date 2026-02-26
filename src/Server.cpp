@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 13:29:15 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 16:03:27 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,11 +178,13 @@ void Server::acceptNewClient()
 
 void Server::receiveNewData(int fd)
 {
-	Client	myClient;
+	Client	*myClient = NULL;
 	char	buff[1024];
 	size_t	end_start;
 
-	myClient = findClientByFd(fd);
+	myClient = &findClientByFd(fd);
+	std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
+
 	//-> buffer for the received data
 	std::memset(buff, 0, sizeof(buff));                  //-> clear the buffer
 	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1, 0); //-> receive the data
@@ -197,14 +199,14 @@ void Server::receiveNewData(int fd)
 		buff[bytes] = '\0';
 		std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
 		std::string myStr = buff;
-		myClient.addBuff(myStr);
+		(*myClient).addBuff(myStr);
 		if (myStr.find("\r\n") != std::string::npos)
 		{
-			end_start = myClient.getBuffer().find_first_of("\r\n");
-			myClient.setBuffer(myClient.getBuffer().erase(end_start,
-					myClient.getBuffer().size()));
-			execute(myClient);
-			myClient.clearBuffer();
+			end_start = (*myClient).getBuffer().find_first_of("\r\n");
+			(*myClient).setBuffer((*myClient).getBuffer().erase(end_start,
+					(*myClient).getBuffer().size()));
+			execute(*myClient);
+			(*myClient).clearBuffer();
 		}
 		// std::cout << myClient.getBuffer() << std::endl;
 	}
@@ -234,7 +236,7 @@ Client &Server::findClientByFd(int fd)
 			return (*it);
 	}
 	// throw(std::exception);
-	return (*(_clients.end()));
+	return (*(_clients.end()));//!change
 }
 static int	parse(std::string cmd)
 {
@@ -302,6 +304,7 @@ int Server::cmdPass(Client &myClient)
 }
 int Server::cmdNick(Client &myClient)
 {
+				std::cout << myClient << std::endl;
 	std::string nickname;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size()
@@ -321,16 +324,19 @@ int Server::cmdNick(Client &myClient)
 }
 int Server::cmdUser(Client &myClient)
 {
+	std::string realname;
 	std::string cpy = myClient.getBuffer();
 	if (cpy.find(":") != std::string::npos)
 	{
-		std::string realname = cpy.substr(cpy.find(":"));
-		cpy.erase(cpy.find(":"));
+		realname = cpy.substr(cpy.find(":"));
+		cpy.erase(cpy.find(":") - 1);
 	}
 	std::vector<std::string> tokens;
 	tokens = split(cpy, " ");
+	std::cout << tokens << std::endl;
+	std::cout << "realname is :" << realname << "." << std::endl;
 	if (tokens.size() != 3)
-		return (1);
+		return (std::cout << "Error :Not a valid User entry." << std::endl, 1);
 	return (0);
 }
 
@@ -398,4 +404,19 @@ int Server::findNickName(std::string nickName)
 			return (1);
 	}
 	return (0);
+}
+
+
+
+std::ostream& operator<<(std::ostream& dataStream, const std::vector<std::string>& vector) 
+{
+    dataStream << "[";
+    for (size_t i = 0; i < vector.size(); ++i) {
+        dataStream << vector[i];
+        if (i != vector.size() - 1) {
+            dataStream << ", ";
+        }
+    }
+    dataStream << "]";
+    return dataStream;
 }
