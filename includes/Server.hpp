@@ -3,10 +3,11 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/25 18:59:15 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/25 18:50:47 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +15,7 @@
 # define SERVER_HPP
 
 # include "Client.hpp"
+# include "Channel.hpp"
 # include <arpa/inet.h> //-> for inet_ntoa()
 # include <csignal>     //-> for signal()
 # include <cstdio>      //-> for signal()
@@ -46,6 +48,7 @@ class Server
 	std::string _password;
 	std::vector<Client> _clients;
 	std::vector<struct pollfd> _fds;
+	std::vector<Channel> _channels;
 
   public:
 	Server(void);
@@ -72,6 +75,11 @@ class Server
 	int cmdPass(Client &myClient);
 	int cmdNick(Client &myClient);
 	int cmdUser(Client &myClient);
+	void cmdJoin(Client cli);
+	void cmdMode(Client cli);
+	void cmdKick(Client cli);
+	void cmdInvite(Client cli);
+	void cmdTopic(Client cli);
 };
 
 #endif
