@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 11:58:33 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 12:21:43 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,8 @@ int Server::cmdNick(Client &myClient)
 {
 	std::string nickname;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
-	if (nameStart == myClient.getBuffer().size())
+	if (nameStart == myClient.getBuffer().size()
+		|| nameStart == std::string::npos)
 		return (0);
 	nickname = (myClient.getBuffer()).substr(nameStart);
 	if (isValidString(nickname))
@@ -307,10 +308,18 @@ int Server::cmdNick(Client &myClient)
 		return (std::cout << "Error :Not a valid Nickame." << std::endl, 1);
 	return (0);
 }
-int	Server::cmdUser(Client &myClient)
+int Server::cmdUser(Client &myClient)
 {
-	std::vector<sts::string> tokens;
-	tokens = split(myClient.getBuffer(), " ");
+	std::string cpy = myClient.getBuffer();
+	if (cpy.find(":") != std::string::npos)
+	{
+		std::string realname = cpy.substr(cpy.find(":"));
+		cpy.erase(cpy.find(":"));
+	}
+	std::vector<std::string> tokens;
+	tokens = split(cpy, " ");
+	if (tokens.size() != 3)
+		return ;
 }
 
 bool	isValidString(const std::string &str)
