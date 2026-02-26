@@ -30,6 +30,7 @@ class Client
 	// void eraseBuffer(size_t start, size_t size);
 	void clearBuffer();
 	int getAuthStatus();
+	bool operator==(const Client &c);
 	int setGrade(int i);
 	void setNickName(std::string name);
 	std::string Client::getNickName()const;

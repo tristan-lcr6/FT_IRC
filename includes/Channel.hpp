@@ -2,6 +2,7 @@
 # define CHANNEL_HPP
 
 # include "Client.hpp"
+# include <vector>
 
 class Channel
 {
@@ -18,6 +19,7 @@ class Channel
 		int			_client_limit;
 	public:
 		Channel(void);
+		Channel(Client &cli); // constructor that puts cli as the first operator
 		Channel(const Channel& other);
 		Channel &operator=(const Channel &other);
 		~Channel();
@@ -36,10 +38,10 @@ class Channel
 		void addOperator(Client &cli); // adds cli to operators
 		void removeOperator(Client &cli); // removes cli from operators
 
-		void setPassword(Client &cli, std::string psw); // verifies that cli is an operator and sets the password and k_mode to true
-		void removePassword(Client &cli); // if cli is operator removes the password and sets k_mode to false
+		void setPassword(std::string psw); // sets the password and k_mode to true
+		void removePassword(void); // removes the password and sets k_mode to false
 
-		std::string &getTopic(void) const; // returns topic
+		const std::string &getTopic(void) const; // returns topic
 		
 		void join(Client &cli); // checks if the client can join and adds it to the clients list
 		void invite(Client &cli); // adds client to the invite list if i_mode is enabled
