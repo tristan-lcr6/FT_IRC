@@ -3,14 +3,14 @@
 // Default constructor
 Channel::Channel(void)
 {
-    // std::cout << "Default constructor called" << std::endl;
-    return ;
+	// std::cout << "Default constructor called" << std::endl;
+	return ;
 }
 
 Channel::Channel(Client &cli, std::string name) : _name(name)
 {
-    this->_operators.push_back(cli);
-    return ;
+	this->_operators.push_back(cli);
+	return ;
 }
 
 // Copy constructor
@@ -28,7 +28,7 @@ Channel::Channel(const Channel &other)
 	this->_operators = other._operators;
 	this->_l_mode = other._l_mode;
 	this->_client_limit = other._client_limit;
-    return ;
+	return ;
 }
 
 // Assignment operator overload
@@ -46,38 +46,40 @@ Channel &Channel::operator=(const Channel &other)
 	this->_operators = other._operators;
 	this->_l_mode = other._l_mode;
 	this->_client_limit = other._client_limit;
-    return (*this);
+	return (*this);
 }
 
 // Destructor
 Channel::~Channel(void)
 {
-    // std::cout << "Destructor called" << std::endl;
-    return ;
+	// std::cout << "Destructor called" << std::endl;
+	return ;
 }
 
 bool Channel::isInviteOnly(void) const
 {
-	return this->_i_mode;
+	return (this->_i_mode);
 }
 
 bool Channel::isTopicOpOnly(void) const
 {
-	return this->_t_mode;
+	return (this->_t_mode);
 }
 
 bool Channel::hasKey(void) const
 {
-	return this->_k_mode;
+	return (this->_k_mode);
 }
 
 bool Channel::isLimited(void) const
 {
-	return this->_l_mode;
+	return (this->_l_mode);
 }
 
 void Channel::setInviteOnly(bool b)
 {
+	b += 1;//!
+
 	if (this->_i_mode)
 		return ;
 	this->_invite_list.clear();
@@ -86,6 +88,7 @@ void Channel::setInviteOnly(bool b)
 
 void Channel::setTopicOpOnly(bool b)
 {
+	b += 1 ;//!
 	this->_t_mode = true;
 }
 
@@ -110,6 +113,7 @@ void Channel::setClientLimit(std::string limit_str)
 
 void Channel::removeClientLimit()
 {
+	limit++;//!
 	this->_l_mode = false;
 }
 
@@ -156,7 +160,7 @@ void Channel::removePassword(void)
 
 const std::string &Channel::getTopic(void) const
 {
-	return this->_topic;
+	return (this->_topic);
 }
 
 const std::string &Channel::getName(void) const

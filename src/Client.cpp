@@ -25,6 +25,10 @@ Client &Client::operator=(const Client &other)
 	if (this != &other)
 	{
 		this->_fd = other.getFd();
+		this->_authStatus = other.getAuthStatus();
+		this->_nickName = other.getNickName();
+		this->_userName = other.getUserName();
+
 	}
 	return (*this);
 }
@@ -80,7 +84,7 @@ void Client::clearBuffer()
 	this->_buff.clear();
 }
 
-int Client::getAuthStatus()
+int Client::getAuthStatus() const
 {
 	return (this->_authStatus);
 }
@@ -88,11 +92,11 @@ int Client::getAuthStatus()
 bool Client::operator==(const Client &c)
 {
 	if (this->_fd == c._fd)
-		return true;
-	return false;
+		return (true);
+	return (false);
 }
 
-int Client::setGrade(int i)
+void Client::setGrade(int i)
 {
 	this->_authStatus = i;
 }
@@ -105,4 +109,24 @@ void Client::setNickName(std::string name)
 std::string Client::getNickName() const
 {
 	return (_nickName);
+}
+
+std::string Client::getUserName() const
+{
+	return (_userName);
+}
+
+
+
+
+std::ostream &operator<<(std::ostream &os, const Client &c)
+{
+	os << "======= [Client Info] =======" << std::endl;
+	os << "FD          : " << c.getFd() << std::endl;
+	os << "IP          : " << c.getIp() << std::endl;
+	os << "Nickname    : " << (c.getNickName().empty() ? "(none)" : c.getNickName()) << std::endl;
+	os << "Auth Status : " << c.getAuthStatus() << std::endl;
+	os << "Buffer      : " << c.getBuffer() << std::endl;
+	os << "=============================";
+	return (os);
 }

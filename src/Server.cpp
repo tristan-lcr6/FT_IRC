@@ -6,6 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
+/*   Updated: 2026/02/26 16:03:27 by tlecuyer         ###   ########.fr       */
 /*   Updated: 2026/02/26 16:02:33 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -178,10 +179,13 @@ void Server::acceptNewClient()
 
 void Server::receiveNewData(int fd)
 {
-	Client	myClient;
+	Client	*myClient = NULL;
 	char	buff[1024];
+	size_t	end_start;
 
-	myClient = findClientByFd(fd);
+	myClient = &findClientByFd(fd);
+	std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
+
 	//-> buffer for the received data
 	std::memset(buff, 0, sizeof(buff));                  //-> clear the buffer
 	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1, 0); //-> receive the data
@@ -196,12 +200,14 @@ void Server::receiveNewData(int fd)
 		buff[bytes] = '\0';
 		std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
 		std::string myStr = buff;
-		// addToBuff(myStr, myClient);
-		myClient.addBuff(myStr);
-		if (myStr.find("/r/n"))
+		(*myClient).addBuff(myStr);
+		if (myStr.find("\r\n") != std::string::npos)
 		{
-			execute(myClient);
-			myClient.clearBuffer();
+			end_start = (*myClient).getBuffer().find_first_of("\r\n");
+			(*myClient).setBuffer((*myClient).getBuffer().erase(end_start,
+					(*myClient).getBuffer().size()));
+			execute(*myClient);
+			(*myClient).clearBuffer();
 		}
 		// std::cout << myClient.getBuffer() << std::endl;
 	}
@@ -231,7 +237,7 @@ Client &Server::findClientByFd(int fd)
 			return (*it);
 	}
 	// throw(std::exception);
-	return (*(_clients.end()));
+	return (*(_clients.end()));//!change
 }
 static int	parse(std::string cmd)
 {
@@ -257,15 +263,17 @@ void Server::execute(Client &cli)
 {
 	int	cmdIdx;
 
+	int (Server::*commands[])(Client &) = {&Server::cmdPass, &Server::cmdNick,
+		&Server::cmdUser};
+	// cmdJoin,
+	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic
 	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 	{
 		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
-	}
-
-	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
-	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
+	(this->*commands[cmdIdx])(cli);
+	return ;
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
 	{
 		std::cerr << "Error tried to log without password" << std::endl;
@@ -283,14 +291,18 @@ void Server::execute(Client &cli)
 
 int Server::cmdPass(Client &myClient)
 {
+	std::cout << myClient << std::endl;
 	std::string passWord;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size())
 		return (0);
-	passWord = (myClient.getBuffer()).substr(nameStart);
+	passWord = (myClient.getBuffer()).substr(nameStart + 1);
+	//?be more specifiques on the spaces rules for password
+	std::cout << "passWord is'" << passWord << "'" << std::endl;
 	if (passWord == _password)
 	{
 		myClient.setGrade(1);
+		std::cout << myClient << std::endl;
 	}
 	else
 	{
@@ -301,16 +313,18 @@ int Server::cmdPass(Client &myClient)
 }
 int Server::cmdNick(Client &myClient)
 {
+				std::cout << myClient << std::endl;
 	std::string nickname;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size()
 		|| nameStart == std::string::npos)
 		return (0);
-	nickname = (myClient.getBuffer()).substr(nameStart);
+	nickname = (myClient.getBuffer()).substr(nameStart + 1);
 	if (isValidString(nickname))
 	{
 		if (!findNickName(nickname))
-			return (myClient.setNickName(nickname), 0);
+			return (myClient.setNickName(nickname),
+				std::cout << myClient << std::endl, 0);
 		return (std::cout << "Error : Nickame already used." << std::endl, 1);
 	}
 	else
@@ -319,16 +333,20 @@ int Server::cmdNick(Client &myClient)
 }
 int Server::cmdUser(Client &myClient)
 {
+	std::string realname;
 	std::string cpy = myClient.getBuffer();
 	if (cpy.find(":") != std::string::npos)
 	{
-		std::string realname = cpy.substr(cpy.find(":"));
-		cpy.erase(cpy.find(":"));
+		realname = cpy.substr(cpy.find(":"));
+		cpy.erase(cpy.find(":") - 1);
 	}
 	std::vector<std::string> tokens;
 	tokens = split(cpy, " ");
+	std::cout << tokens << std::endl;
+	std::cout << "realname is :" << realname << "." << std::endl;
 	if (tokens.size() != 3)
-		return ;
+		return (std::cout << "Error :Not a valid User entry." << std::endl, 1);
+	return (0);
 }
 
 bool	isValidString(const std::string &str)
@@ -454,9 +472,9 @@ void Server::cmdInvite(Client &cli)
 // TOPIC #test -> affiche le topic
 // TOPIC #test :New topic -> change le topic
 // si channel +t alors le changement est op-only
-void Server::cmdTopic(Client cli)
-{
-}
+// void Server::cmdTopic(Client cli)
+// {
+// }
 
 int Server::findNickName(std::string nickName)
 {
@@ -466,4 +484,19 @@ int Server::findNickName(std::string nickName)
 			return (1);
 	}
 	return (0);
+}
+
+
+
+std::ostream& operator<<(std::ostream& dataStream, const std::vector<std::string>& vector) 
+{
+    dataStream << "[";
+    for (size_t i = 0; i < vector.size(); ++i) {
+        dataStream << vector[i];
+        if (i != vector.size() - 1) {
+            dataStream << ", ";
+        }
+    }
+    dataStream << "]";
+    return dataStream;
 }
