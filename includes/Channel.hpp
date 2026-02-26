@@ -3,6 +3,7 @@
 
 # include "Client.hpp"
 # include <vector>
+# include <cstdlib>
 # include <limits>
 
 class Channel
@@ -18,7 +19,7 @@ class Channel
 		std::string	_password;
 		std::vector<Client> _operators;
 		bool		_l_mode;
-		int			_client_limit;
+		size_t		_client_limit;
 	public:
 		Channel(void);
 		Channel(Client &cli, std::string name); // constructor that puts cli as the first operator
@@ -58,6 +59,10 @@ class Channel
 		void applyMode(char c, bool add); // applies the mode assigned to the char c
 		void applyMode(char c, bool add, std::string param); // applies the mode assigned to the char c with the params
 };
+
+#include <iostream>
+
+std::ostream &operator<<(std::ostream &os, const Channel &channel);
 
 #endif
 
