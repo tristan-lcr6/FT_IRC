@@ -7,7 +7,7 @@ Channel::Channel(void)
     return ;
 }
 
-Channel::Channel(Client &cli)
+Channel::Channel(Client &cli, std::string name) : _name(name)
 {
     this->_operators.push_back(cli);
     return ;
@@ -17,6 +17,7 @@ Channel::Channel(Client &cli)
 Channel::Channel(const Channel &other)
 {
     // std::cout << "Copy constructor called" << std::endl;
+	this->_name = other._name;
     this->_topic = other._topic;
 	this->_clients = other._clients;
 	this->_i_mode = other._i_mode;
@@ -34,6 +35,7 @@ Channel::Channel(const Channel &other)
 Channel &Channel::operator=(const Channel &other)
 {
     // std::cout << "Assignment operator called" << std::endl;
+	this->_name = other._name;
     this->_topic = other._topic;
 	this->_clients = other._clients;
 	this->_i_mode = other._i_mode;
@@ -93,7 +95,20 @@ void Channel::setClientLimit(int limit)
 	this->_client_limit = limit;
 }
 
-void Channel::removeClientLimit(int limit)
+void Channel::setClientLimit(std::string limit_str)
+{
+	int limit;
+	char *end;
+	long l = std::strtol(limit_str.c_str(), &end, 10);
+	if (end != '\0' || l < 1 || l > std::numeric_limits<int>::max())
+	{
+		std::cerr << "Invalid client limit" << std::endl;
+		return ; //! error invalid input
+	}
+	this->setClientLimit(limit);
+}
+
+void Channel::removeClientLimit()
 {
 	this->_l_mode = false;
 }
@@ -101,6 +116,12 @@ void Channel::removeClientLimit(int limit)
 void Channel::addOperator(Client &cli)
 {
 	this->_operators.push_back(cli);
+}
+
+void Channel::addOperator(std::string nick)
+{
+	Client &cli = this->getClient(nick);
+	this->addOperator(cli);
 }
 
 void Channel::removeOperator(Client &cli)
@@ -113,6 +134,12 @@ void Channel::removeOperator(Client &cli)
 			return ;
 		}
 	}
+}
+
+void Channel::removeOperator(std::string nick)
+{
+	Client &cli = this->getClient(nick);
+	this->removeOperator(cli);
 }
 
 void Channel::setPassword(std::string psw)
@@ -132,10 +159,34 @@ const std::string &Channel::getTopic(void) const
 	return this->_topic;
 }
 
+const std::string &Channel::getName(void) const
+{
+	return this->_name;
+}
+
+Client &Channel::getClient(std::string nick)
+{
+	for (std::size_t i = 0; i < this->_clients.size(); i++)
+	{
+		if (this->_clients[i].getNickname() == nick)
+			return (this->_clients[i]);
+	}
+	std::cerr << "Client " << nick << " not found in channel " << this->_name << std::endl;
+	return (this->_clients[0]); //! Error client not found j'arrive pas a renvoyer NULL
+}
+
 void Channel::join(Client &cli)
 {
+	if (this->_k_mode)
+	{
+		std::cerr << "Error: tried to join " << this->_name << " without password" << std::endl;
+		return ; //! erreur besoin de password
+	}
 	if (this->_l_mode && this->_clients.size() >= this->_client_limit)
+	{
+		std::cerr << "Error: can't join, " << this->_name << " is full" << std::endl;
 		return ; //! erreur peut pas rejoindre
+	}
 	if (this->_i_mode)
 	{
 		for (std::size_t i = 0; i < this->_invite_list.size(); i++)
@@ -146,6 +197,35 @@ void Channel::join(Client &cli)
 				return ;
 			}
 		}
+		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickname() << ") are not invited" << std::endl;
+		return ; //! erreur n'est pas invite
+	}
+	this->_clients.push_back(cli);
+}
+
+void Channel::join(Client &cli, std::string pwd)
+{
+	if (this->_k_mode && this->_password != pwd)
+	{
+		std::cerr << "Error: tried to join " << this->_name << " with wrong password" << std::endl;
+		return ; //! erreur mauvais password
+	}
+	if (this->_l_mode && this->_clients.size() >= this->_client_limit)
+	{
+		std::cerr << "Error: can't join, " << this->_name << " is full" << std::endl;
+		return ; //! erreur peut pas rejoindre
+	}
+	if (this->_i_mode)
+	{
+		for (std::size_t i = 0; i < this->_invite_list.size(); i++)
+		{
+			if (this->_invite_list[i] == cli)
+			{
+				this->_clients.push_back(cli);
+				return ;
+			}
+		}
+		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickname() << ") are not invited" << std::endl;
 		return ; //! erreur n'est pas invite
 	}
 	this->_clients.push_back(cli);
@@ -154,4 +234,69 @@ void Channel::join(Client &cli)
 void Channel::invite(Client &cli)
 {
 	this->_invite_list.push_back(cli);
+}
+
+bool Channel::modeWithParam(char c, bool add)
+{
+	if (add)
+	{
+		std::string modes = "kol";
+		if (modes.find(c) != std::string::npos)
+			return true;
+		return false;
+	}
+	if (c == 'o')
+		return true;
+	return false;
+}
+
+void Channel::applyMode(char c, bool add)
+{
+	if (modeWithParam(c, add))
+	{
+		std::cerr << "Error: tried to apply mode " << c << " without params" << std::endl;
+		return ; //! error mode needs param
+	}
+	switch (c)
+	{
+	case 'i':
+		this->setInviteOnly(add);
+		break;
+	case 't':
+		this->setTopicOpOnly(add);
+		break;
+	case 'k':
+		this->removePassword();
+		break;
+	case 'l':
+		this->removeClientLimit();
+		break;
+	default:
+		std::cerr << "Error: tried to apply an unknown mode: " << c << std::endl;
+		//! error unknown mode
+		break;
+	}
+}
+
+void Channel::applyMode(char c, bool add, std::string param)
+{
+	switch (c)
+	{
+	case 'k':
+		this->setPassword(param);
+		break;
+	case 'o':
+		if (add)
+			this->addOperator(param);
+		else
+			this->removeOperator(param);
+		break;
+	case 'l':
+		this->setClientLimit(param);
+		break;
+	default:
+		std::cerr << "Error: tried to apply an unknown mode: " << c << std::endl;
+		//! error unknown mode
+		break;
+	}
 }

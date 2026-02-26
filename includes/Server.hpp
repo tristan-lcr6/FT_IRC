@@ -6,16 +6,17 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 18:59:15 by tlecuyer         ###   ########.fr       */
-/*   Updated: 2026/02/25 18:50:47 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/26 12:10:11 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
 # include "Client.hpp"
 # include "Channel.hpp"
+# include "utils.hpp"
 # include <arpa/inet.h> //-> for inet_ntoa()
 # include <csignal>     //-> for signal()
 # include <cstdio>      //-> for signal()
@@ -71,15 +72,15 @@ class Server
 	void clearClient(int fd);
 
 	Client &findClientByFd(int fd);
-	void execute(Client cli);
+	void execute(Client &cli);
 	int cmdPass(Client &myClient);
 	int cmdNick(Client &myClient);
 	int cmdUser(Client &myClient);
-	void cmdJoin(Client cli);
-	void cmdMode(Client cli);
-	void cmdKick(Client cli);
-	void cmdInvite(Client cli);
-	void cmdTopic(Client cli);
+	void cmdJoin(Client &cli);
+	void cmdMode(Client &cli);
+	void cmdKick(Client &cli);
+	void cmdInvite(Client &cli);
+	void cmdTopic(Client &cli);
 };
 
 #endif
