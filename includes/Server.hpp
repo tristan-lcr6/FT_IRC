@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 16:41:32 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 19:01:09 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ class Server
 	void clearClient(int fd);
 
 	Client &findClientByFd(int fd);
+	Channel &getChannel(std::string name); // returns the vector of clients in corresponding channel
+
 	void execute(Client &cli);
 	int findNickName(std::string nickName);
 	void cmdPass(Client &myClient);

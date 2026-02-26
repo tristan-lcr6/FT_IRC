@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <vector>
+#include <sys/socket.h>
 
 
 class Client
@@ -12,6 +13,7 @@ class Client
 	int _authStatus;
 	std::string _nickName;
 	std::string _userName;
+	std::string _realName;
 	std::string _IP;
 	std::string _buff;
 
@@ -31,12 +33,18 @@ class Client
 	bool operator==(const Client &c);
 	void setGrade(int i);
 	void setNickName(std::string name);
+	void setRealName(std::string name);
+	void setUserName(std::string name);
 	int getAuthStatus() const;
 	std::string getIp() const;
 	std::string getNickName() const;
 	std::string getUserName() const;
 	std::string getBuffer() const;
+	std::string getRealName() const;
 	int getFd() const;
+	bool operator!=(const Client &other);
+	void sendMessage(std::string& msg) const;
+
 };
 
 std::ostream &operator<<(std::ostream &os, const Client &c);

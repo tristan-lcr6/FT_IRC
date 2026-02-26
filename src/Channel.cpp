@@ -301,25 +301,25 @@ void Channel::applyMode(char c, bool add, std::string param)
 std::ostream &operator<<(std::ostream &os, const Channel &channel) {
     os << "--- Channel: " << channel.getName() << " ---" << std::endl;
     os << "Topic: " << (channel.getTopic().empty() ? "(aucun)" : channel.getTopic()) << std::endl;
-    
-    // Affichage des modes actifs
     os << "Modes: [";
     if (channel.isInviteOnly()) os << "i";
     if (channel.isTopicOpOnly()) os << "t";
     if (channel.hasKey())        os << "k";
     if (channel.isLimited())     os << "l";
     os << "]" << std::endl;
-
-    // Détails des limites et clés
     if (channel.isLimited()) {
-        // Note: Il te faudra peut-être un getter getClientLimit() 
-        // ou accéder à _client_limit si tu mets cette fonction en 'friend'
         os << "Limit: " << "activée" << std::endl; 
     }
-    
-    // On peut aussi afficher le nombre de clients présents
-    // os << "Clients connectés: " << channel.getClients().size() << std::endl;
-
     os << "---------------------------";
     return os;
+}
+
+
+void Channel::sendChannelMessage(Client & myClient, std::string message)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if(_clients[i] != myClient)
+			_clients[i].sendMessage(message);	
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 17:07:53 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 19:34:57 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,7 +328,8 @@ void Server::cmdNick(Client &myClient)
 			myClient.setNickName(nickname);
 				std::cout << myClient << std::endl;
 		}
-		std::cout << "Error : Nickame already used." << std::endl;
+		else 
+			std::cout << "Error : Nickame already used." << std::endl;
 	}
 	else
 		std::cout << "Error :Not a valid Nickame." << std::endl;
@@ -337,18 +338,28 @@ void Server::cmdUser(Client &myClient)
 {
 	std::string realname;
 	std::string cpy = myClient.getBuffer();
-	if (cpy.find(":") != std::string::npos)
-	{
-		realname = cpy.substr(cpy.find(":"));
-		cpy.erase(cpy.find(":") - 1);
-	}
+	if(cpy.find(":") == std::string::npos)
+		std::cout << "Error :could not find ':' to start collect realname" << std::endl;
+	realname = cpy.substr(cpy.find(":") + 1);
+	cpy.erase(cpy.find(":") - 1);
 	std::vector<std::string> tokens;
 	tokens = split(cpy, " ");
-	std::cout << tokens << std::endl;
-	std::cout << "realname is :" << realname << "." << std::endl;
-	if (tokens.size() != 4)
+	if (tokens.size() > 4 || tokens.size() < 2)
+	{
 		std::cout << "Error :Not a valid User entry." << std::endl;
-	myClient.setGrade(2);
+		return ;
+	}
+	else if (myClient.getAuthStatus() == 1)
+	{
+		myClient.setRealName(realname);
+		myClient.setUserName(tokens[1]);
+		std::cout << myClient.getUserName() << " is now grade 2." << std::endl;
+		myClient.setGrade(2);
+		std::cout << myClient << std::endl;
+	
+	}
+	else 
+		std::cout << "Error :User Cannot get grade 2." << std::endl;
 }
 
 bool	isValidString(const std::string &str)
@@ -471,10 +482,49 @@ void Server::cmdKick(Client &cli)
 	(void)cli;
 }
 
-void Server::cmdPrivMsg(Client &cli)
+void Server::cmdPrivMsg(Client &myClient)
 {
-	(void)cli;
+	std::string message;
+	std::string contactName;
+	std::string cpy = myClient.getBuffer();
+	if(cpy.find(":") == std::string::npos)
+		std::cout << "Error :could not find ':' to start collect message" << std::endl;
+	message = cpy.substr(cpy.find(":") + 1);
+	cpy.erase(cpy.find(":") - 1);
+	std::vector<std::string> tokens;
+	tokens = split(cpy, " ");
+	if (tokens.size() != 2)
+	{
+		std::cout << "Error :Not a valid entry for Private Message." << std::endl;
+		return ;
+	}
+	contactName = tokens[1];
+	if(contactName.find("#"))
+	{
+		getChannel(contactName).sendChannelMessage(myClient, message);
+	}
+	else
+		findNickName(contactName);
 }
+Channel &Server::getChannel(std::string name)
+{
+	for (size_t i = 0; i < _channels.size();i++)
+	{
+		if(_channels[i].getName() == name)
+		{
+			return (_channels[i]);
+		}
+	}
+	std::cout << "Error :could not find channel named "<< name << std::endl;
+	return (_channels[0]);//! throw exception instead
+}
+
+
+
+
+
+
+
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
@@ -498,7 +548,7 @@ int Server::findNickName(std::string nickName)
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
 		if (_clients[i].getNickName() == nickName)
-			return (1);
+			return (_clients[i].getFd());
 	}
 	return (0);
 }

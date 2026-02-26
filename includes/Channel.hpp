@@ -58,7 +58,10 @@ class Channel
 		void invite(Client &cli); // adds client to the invite list if i_mode is enabled
 		void applyMode(char c, bool add); // applies the mode assigned to the char c
 		void applyMode(char c, bool add, std::string param); // applies the mode assigned to the char c with the params
-};
+
+		void Channel::sendChannelMessage(Client & myClient, std::string message);
+
+	};
 
 #include <iostream>
 
