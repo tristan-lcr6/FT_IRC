@@ -23,7 +23,7 @@ class Client
 	~Client();
 	int setFd(int fd);
 	std::string setIp(std::string ip);
-
+	const std::string &getNickname(void) const;
 	void addBuff(std::string data);
 	std::string setBuffer(std::string str);
 	// void eraseBuffer(size_t start, size_t size);

@@ -7,6 +7,7 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/26 16:03:27 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 16:02:33 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,13 +269,21 @@ void Server::execute(Client &cli)
 	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic
 	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
+	{
+		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
 	(this->*commands[cmdIdx])(cli);
 	return ;
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
+	{
+		std::cerr << "Error tried to log without password" << std::endl;
 		return ; //! frerot faut mettre un mdp
+	}
 	else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
+	{
+		std::cerr << "Error tried to cmd without log" << std::endl;
 		return ; //! frerot log toi
+	}
 	else
 		// commands[cmdIdx](cli);
 		return ;
@@ -361,9 +370,33 @@ bool	isValidString(const std::string &str)
 // JOIN #a,#b,#c passA,passB,passC
 // If the channel exists and can join, joins it
 // If it doesn't exist create it
-// void Server::cmdJoin(Client cli)
-// {
-// }
+void Server::cmdJoin(Client &cli)
+{
+	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::vector<std::string> channels = split(tokens[1], ',');
+	std::vector<std::string> passwords;
+	if (tokens.size() > 2)
+		passwords = split(tokens[2], ',');
+	for (std::size_t i = 0; i < channels.size(); i++)
+	{
+		bool found = false;
+		std::string name = channels[i];
+		for (std::size_t j = 0; j < this->_channels.size(); j++)
+		{
+			if (name == this->_channels[j].getName())
+			{
+				if (i < passwords.size() && !passwords[i].empty())
+					this->_channels[j].join(cli, passwords[i]);
+				else
+					this->_channels[j].join(cli);
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			this->_channels.push_back(Channel(cli, name));
+	}
+}
 
 // MODE <channel> <modes> [params]
 // MODE #test +i
@@ -372,21 +405,68 @@ bool	isValidString(const std::string &str)
 // MODE #test +l 10
 // MODE #test -k
 // Verifies that cli is an operator then executes the asked action
-// void Server::cmdMode(Client cli)
-// {
-// }
+void Server::cmdMode(Client &cli)
+{
+	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::string channel_name = tokens[1];
+	bool found = false;
+	Channel *channel;
+	for (std::size_t i = 0; i < this->_channels.size(); i++)
+	{
+		if (channel_name == this->_channels[i].getName())
+		{
+			channel = &this->_channels[i];
+			found = true;
+			break;
+		}
+	}
+	if (!found)
+	{
+		std::cerr << "Error: tried to mode an unknown channel: " << channel_name << std::endl;
+		return ; //! Channel doesn't exist
+	}
+	std::string modestring = tokens[2];
+	std::vector<std::string> params;
+	if (tokens.size() > 3)
+		params = split(tokens[3], ' ');
+	std::size_t paramIdx = 0;
+	bool add = true;
+	for (size_t i = 0; i < modestring.size(); ++i)
+	{
+		char c = modestring[i];
+		if (c == '+')
+		{
+			add = true;
+			continue;
+		}
+		if (c == '-')
+		{
+			add = false;
+			continue;
+		}
+		if (Channel::modeWithParam(c, add))
+		{
+			if (paramIdx >= params.size())
+            {
+				std::cerr << "Error: the mode " << c << " needs params" << std::endl;
+				return ; //! error not enough params
+			}
+			channel->applyMode(c, add, params[paramIdx++]);
+		}
+		else
+			channel->applyMode(c, add);
+	}
+}
 
 // KICK <channel> <nick> [:reason]
 // KICK #test john :spamming
-// void Server::cmdKick(Client cli)
-// {
-// }
+void Server::cmdKick(Client &cli)
+{}
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
-// void Server::cmdInvite(Client cli)
-// {
-// }
+void Server::cmdInvite(Client &cli)
+{}
 
 // TOPIC <channel> [:topic]
 // TOPIC #test -> affiche le topic

@@ -7,13 +7,16 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
 /*   Updated: 2026/02/26 12:53:47 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 12:10:11 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef SERVER_HPP
 # define SERVER_HPP
 
 # include "Channel.hpp"
+# include "utils.hpp"
 # include "Client.hpp"
 # include <arpa/inet.h> //-> for inet_ntoa()
 # include <csignal>     //-> for signal()
@@ -70,16 +73,17 @@ class Server
 	void clearClient(int fd);
 
 	Client &findClientByFd(int fd);
+	void execute(Client &cli);
 	int findNickName(std::string nickName);
 	void execute(Client &cli);
 	int cmdPass(Client &myClient);
 	int cmdNick(Client &myClient);
 	int cmdUser(Client &myClient);
-	void cmdJoin(Client cli);
-	void cmdMode(Client cli);
-	void cmdKick(Client cli);
-	void cmdInvite(Client cli);
-	void cmdTopic(Client cli);
+	void cmdJoin(Client &cli);
+	void cmdMode(Client &cli);
+	void cmdKick(Client &cli);
+	void cmdInvite(Client &cli);
+	void cmdTopic(Client &cli);
 };
 
 bool	isValidString(const std::string &str);
