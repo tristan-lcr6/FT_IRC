@@ -3,11 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/25 19:26:54 by tlecuyer         ###   ########.fr       */
-/*   Updated: 2026/02/25 18:48:07 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/26 11:58:33 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,13 +274,15 @@ void Server::execute(Client cli)
 
 int Server::cmdPass(Client &myClient)
 {
-	std::string arg;
-	std::size_t name_end = (myClient.getBuffer()).find_first_of(' ');
-	if (name_end == myClient.getBuffer().size())
+	std::string passWord;
+	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
+	if (nameStart == myClient.getBuffer().size())
 		return (0);
-	arg = (myClient.getBuffer()).substr(name_end);
-	if (arg == _password)
+	passWord = (myClient.getBuffer()).substr(nameStart);
+	if (passWord == _password)
+	{
 		myClient.setGrade(1);
+	}
 	else
 	{
 		std::cout << "Error :wrong Password." << std::endl;
@@ -289,55 +290,73 @@ int Server::cmdPass(Client &myClient)
 	}
 	return (0);
 }
-int	cmdNick(Client &myClient)
+int Server::cmdNick(Client &myClient)
 {
-	std::string arg;
-	std::size_t name_end = (myClient.getBuffer()).find_first_of(' ');
-	if (name_end == myClient.getBuffer().size())
+	std::string nickname;
+	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
+	if (nameStart == myClient.getBuffer().size())
 		return (0);
-	arg = (myClient.getBuffer()).substr(name_end);
-	if (isValidString(arg))
-		myClient.setNickName(arg);
-	else
+	nickname = (myClient.getBuffer()).substr(nameStart);
+	if (isValidString(nickname))
 	{
-		std::cout << "Error :wrong Nickame." << std::endl;
-		return (1);
+		if (!findNickName(nickname))
+			return (myClient.setNickName(nickname), 0);
+		return (std::cout << "Error : Nickame already used." << std::endl, 1);
 	}
+	else
+		return (std::cout << "Error :Not a valid Nickame." << std::endl, 1);
 	return (0);
 }
-int	cmdUser(Client &myClient)
+int	Server::cmdUser(Client &myClient)
 {
+	std::vector<sts::string> tokens;
+	tokens = split(myClient.getBuffer(), " ");
 }
 
-bool isValidString(const std::string& str)
+bool	isValidString(const std::string &str)
 {
-    if (str.empty())
-        return false;
+	char	c;
 
-    for (size_t i = 0; i < str.length(); ++i) {
-        char c = str[i];
-        
-        if (!((c >= 'a' && c <= 'z') || 
-              (c >= 'A' && c <= 'Z') || 
-              (c >= '0' && c <= '9') || 
-              c == '_')) {
-            return false;
-        }
-    }
-    return true;
+	if (str.empty())
+		return (false);
+	for (size_t i = 0; i < str.length(); ++i)
+	{
+		c = str[i];
+		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0'
+					&& c <= '9') || c == '_'))
+		{
+			return (false);
+		}
+	}
+	return (true);
 }
 
 void Server::cmdJoin(Client cli)
-{}
+{
+}
 
 void Server::cmdMode(Client cli)
-{}
+{
+}
 
 void Server::cmdKick(Client cli)
-{}
+{
+}
 
 void Server::cmdInvite(Client cli)
-{}
+{
+}
 
 void Server::cmdTopic(Client cli)
-{}
+{
+}
+
+int Server::findNickName(std::string nickName)
+{
+	for (size_t i = 0; i < _clients.size(); i++)
+	{
+		if (_clients[i].getNickName() == nickName)
+			return (1);
+	}
+	return (0);
+}
