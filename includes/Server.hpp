@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 11:49:17 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/26 12:53:47 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ class Server
 
 	Client &findClientByFd(int fd);
 	int findNickName(std::string nickName);
-	void execute(Client cli);
+	void execute(Client &cli);
 	int cmdPass(Client &myClient);
 	int cmdNick(Client &myClient);
 	int cmdUser(Client &myClient);
@@ -82,5 +82,8 @@ class Server
 	void cmdTopic(Client cli);
 };
 
+bool	isValidString(const std::string &str);
 std::vector<std::string> split(std::string s, std::string delimiter);
+
+
 #endif

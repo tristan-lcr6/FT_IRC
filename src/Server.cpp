@@ -6,8 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 12:21:43 by tlecuyer         ###   ########.fr       */
-/*   Updated: 2026/02/26 11:09:50 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/02/26 13:29:15 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +180,7 @@ void Server::receiveNewData(int fd)
 {
 	Client	myClient;
 	char	buff[1024];
+	size_t	end_start;
 
 	myClient = findClientByFd(fd);
 	//-> buffer for the received data
@@ -197,10 +197,12 @@ void Server::receiveNewData(int fd)
 		buff[bytes] = '\0';
 		std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
 		std::string myStr = buff;
-		// addToBuff(myStr, myClient);
 		myClient.addBuff(myStr);
-		if (myStr.find("/r/n"))
+		if (myStr.find("\r\n") != std::string::npos)
 		{
+			end_start = myClient.getBuffer().find_first_of("\r\n");
+			myClient.setBuffer(myClient.getBuffer().erase(end_start,
+					myClient.getBuffer().size()));
 			execute(myClient);
 			myClient.clearBuffer();
 		}
@@ -254,16 +256,19 @@ static int	parse(std::string cmd)
 	return (i);
 }
 
-void Server::execute(Client cli)
+void Server::execute(Client &cli)
 {
 	int	cmdIdx;
 
+	int (Server::*commands[])(Client &) = {&Server::cmdPass, &Server::cmdNick,
+		&Server::cmdUser};
+	// cmdJoin,
+	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic
 	cmdIdx = parse(cli.getBuffer());
 	if (cmdIdx < 0 || cmdIdx > 8)
 		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
-	//
-	// void (*commands[9])(Client) = {cmdPass, cmdNick, cmdUser, cmdJoin,
-	// cmdPrivMsg, cmdMode, cmdKick, cmdInvite, cmdTopic};
+	(this->*commands[cmdIdx])(cli);
+	return ;
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
 		return ; //! frerot faut mettre un mdp
 	else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
@@ -275,14 +280,18 @@ void Server::execute(Client cli)
 
 int Server::cmdPass(Client &myClient)
 {
+	std::cout << myClient << std::endl;
 	std::string passWord;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size())
 		return (0);
-	passWord = (myClient.getBuffer()).substr(nameStart);
+	passWord = (myClient.getBuffer()).substr(nameStart + 1);
+	//?be more specifiques on the spaces rules for password
+	std::cout << "passWord is'" << passWord << "'" << std::endl;
 	if (passWord == _password)
 	{
 		myClient.setGrade(1);
+		std::cout << myClient << std::endl;
 	}
 	else
 	{
@@ -298,11 +307,12 @@ int Server::cmdNick(Client &myClient)
 	if (nameStart == myClient.getBuffer().size()
 		|| nameStart == std::string::npos)
 		return (0);
-	nickname = (myClient.getBuffer()).substr(nameStart);
+	nickname = (myClient.getBuffer()).substr(nameStart + 1);
 	if (isValidString(nickname))
 	{
 		if (!findNickName(nickname))
-			return (myClient.setNickName(nickname), 0);
+			return (myClient.setNickName(nickname),
+				std::cout << myClient << std::endl, 0);
 		return (std::cout << "Error : Nickame already used." << std::endl, 1);
 	}
 	else
@@ -320,7 +330,8 @@ int Server::cmdUser(Client &myClient)
 	std::vector<std::string> tokens;
 	tokens = split(cpy, " ");
 	if (tokens.size() != 3)
-		return ;
+		return (1);
+	return (0);
 }
 
 bool	isValidString(const std::string &str)
@@ -344,9 +355,9 @@ bool	isValidString(const std::string &str)
 // JOIN #a,#b,#c passA,passB,passC
 // If the channel exists and can join, joins it
 // If it doesn't exist create it
-void Server::cmdJoin(Client cli)
-{
-}
+// void Server::cmdJoin(Client cli)
+// {
+// }
 
 // MODE <channel> <modes> [params]
 // MODE #test +i
@@ -355,29 +366,29 @@ void Server::cmdJoin(Client cli)
 // MODE #test +l 10
 // MODE #test -k
 // Verifies that cli is an operator then executes the asked action
-void Server::cmdMode(Client cli)
-{
-}
+// void Server::cmdMode(Client cli)
+// {
+// }
 
 // KICK <channel> <nick> [:reason]
 // KICK #test john :spamming
-void Server::cmdKick(Client cli)
-{
-}
+// void Server::cmdKick(Client cli)
+// {
+// }
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
-void Server::cmdInvite(Client cli)
-{
-}
+// void Server::cmdInvite(Client cli)
+// {
+// }
 
 // TOPIC <channel> [:topic]
 // TOPIC #test -> affiche le topic
 // TOPIC #test :New topic -> change le topic
 // si channel +t alors le changement est op-only
-void Server::cmdTopic(Client cli)
-{
-}
+// void Server::cmdTopic(Client cli)
+// {
+// }
 
 int Server::findNickName(std::string nickName)
 {
