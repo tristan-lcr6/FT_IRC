@@ -1,15 +1,15 @@
 #include "Channel.hpp"
 
 // Default constructor
-Channel::Channel(void)
+Channel::Channel(void) : _name("#default"), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
 {
 	// std::cout << "Default constructor called" << std::endl;
 	return ;
 }
 
-Channel::Channel(Client &cli, std::string name) : _name(name)
+Channel::Channel(Client &cli, std::string name) : _name(name), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
 {
-	this->_operators.push_back(cli);
+	this->_operators.push_back(&cli);
 	return ;
 }
 
@@ -86,7 +86,7 @@ void Channel::setTopicOpOnly(bool b)
 	this->_t_mode = b;
 }
 
-void Channel::setClientLimit(int limit)
+void Channel::setClientLimit(size_t limit)
 {
 	this->_l_mode = true;
 	this->_client_limit = limit;
@@ -95,13 +95,13 @@ void Channel::setClientLimit(int limit)
 void Channel::setClientLimit(std::string limit_str)
 {
 	char *end;
-	size_t l = std::strtol(limit_str.c_str(), &end, 10);
+	long l = std::strtol(limit_str.c_str(), &end, 10);
 	if (*end != '\0' || l < 1 )
 	{
 		std::cerr << "Invalid client limit" << std::endl;
 		return ; //! error invalid input
 	}
-	this->setClientLimit(l);
+	this->setClientLimit(static_cast<size_t>(l));
 }
 
 void Channel::removeClientLimit()
@@ -109,22 +109,22 @@ void Channel::removeClientLimit()
 	this->_l_mode = false;
 }
 
-void Channel::addOperator(Client &cli)
+void Channel::addOperator(Client *cli)
 {
 	this->_operators.push_back(cli);
 }
 
 void Channel::addOperator(std::string nick)
 {
-	Client &cli = this->getClient(nick);
+	Client *cli = this->getClient(nick);
 	this->addOperator(cli);
 }
 
-void Channel::removeOperator(Client &cli)
+void Channel::removeOperator(Client *cli)
 {
 	for (std::size_t i = 0; i < this->_operators.size(); i++)
 	{
-		if (this->_operators[i] == cli)
+		if (*this->_operators[i] == *cli)
 		{
 			this->_operators.erase(this->_operators.begin() + i);
 			return ;
@@ -134,7 +134,7 @@ void Channel::removeOperator(Client &cli)
 
 void Channel::removeOperator(std::string nick)
 {
-	Client &cli = this->getClient(nick);
+	Client *cli = this->getClient(nick);
 	this->removeOperator(cli);
 }
 
@@ -155,20 +155,25 @@ const std::string &Channel::getTopic(void) const
 	return (this->_topic);
 }
 
+void Channel::setTopic(std::string topic)
+{
+	this->_topic = topic;
+}
+
 const std::string &Channel::getName(void) const
 {
 	return this->_name;
 }
 
-Client &Channel::getClient(std::string nick)
+Client *Channel::getClient(std::string nick)
 {
 	for (std::size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i].getNickname() == nick)
+		if (this->_clients[i]->getNickname() == nick)
 			return (this->_clients[i]);
 	}
 	std::cerr << "Client " << nick << " not found in channel " << this->_name << std::endl;
-	return (this->_clients[0]); //! Error client not found j'arrive pas a renvoyer NULL
+	return (NULL); //! Error client not found j'arrive pas a renvoyer NULL
 }
 
 void Channel::join(Client &cli)
@@ -187,16 +192,16 @@ void Channel::join(Client &cli)
 	{
 		for (std::size_t i = 0; i < this->_invite_list.size(); i++)
 		{
-			if (this->_invite_list[i] == cli)
+			if (*this->_invite_list[i] == cli)
 			{
-				this->_clients.push_back(cli);
+				this->_clients.push_back(&cli);
 				return ;
 			}
 		}
 		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickname() << ") are not invited" << std::endl;
 		return ; //! erreur n'est pas invite
 	}
-	this->_clients.push_back(cli);
+	this->_clients.push_back(&cli);
 }
 
 void Channel::join(Client &cli, std::string pwd)
@@ -215,21 +220,42 @@ void Channel::join(Client &cli, std::string pwd)
 	{
 		for (std::size_t i = 0; i < this->_invite_list.size(); i++)
 		{
-			if (this->_invite_list[i] == cli)
+			if (*this->_invite_list[i] == cli)
 			{
-				this->_clients.push_back(cli);
+				this->_clients.push_back(&cli);
 				return ;
 			}
 		}
 		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickname() << ") are not invited" << std::endl;
 		return ; //! erreur n'est pas invite
 	}
-	this->_clients.push_back(cli);
+	this->_clients.push_back(&cli);
+}
+
+void Channel::kick(Client &cli)
+{
+	for (size_t i = 0; i < this->_clients.size(); i++)
+	{
+		if (*this->_clients[i] == cli)
+		{
+			this->_clients.erase(this->_clients.begin() + i);
+			break;
+		}
+	}
+	for (size_t i = 0; i < this->_invite_list.size(); i++)
+	{
+		if (*this->_invite_list[i] == cli)
+		{
+			this->_invite_list.erase(this->_invite_list.begin() + i);
+			break;
+		}
+	}
+	this->removeOperator(&cli);
 }
 
 void Channel::invite(Client &cli)
 {
-	this->_invite_list.push_back(cli);
+	this->_invite_list.push_back(&cli);
 }
 
 bool Channel::modeWithParam(char c, bool add)
