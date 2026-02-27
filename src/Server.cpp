@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 17:07:53 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/27 12:06:17 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -413,20 +413,15 @@ void Server::cmdJoin(Client &cli)
 void Server::cmdMode(Client &cli)
 {
 	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	if (tokens.size() < 3)
+	{
+		std::cerr << "Error: not enough arguments for MODE" << std::endl;
+		return ; //!
+	}
 	std::string channel_name = tokens[1];
 	std::cout << "Moding " << channel_name << " channel" << std::endl;
-	bool found = false;
-	Channel *channel;
-	for (std::size_t i = 0; i < this->_channels.size(); i++)
-	{
-		if (channel_name == this->_channels[i].getName())
-		{
-			channel = &this->_channels[i];
-			found = true;
-			break;
-		}
-	}
-	if (!found)
+	Channel *channel = NULL;
+	if (!this->findChannel(channel, channel_name))
 	{
 		std::cerr << "Error: tried to mode an unknown channel: " << channel_name << std::endl;
 		return ; //! Channel doesn't exist
@@ -464,11 +459,51 @@ void Server::cmdMode(Client &cli)
 	}
 }
 
+bool Server::findChannel(Channel *&channel, const std::string &channel_name)
+{
+	for (std::size_t i = 0; i < this->_channels.size(); i++)
+	{
+		if (channel_name == this->_channels[i].getName())
+		{
+			channel = &this->_channels[i];
+			return true;
+		}
+	}
+	return false;
+}
+
 // KICK <channel> <nick> [:reason]
 // KICK #test john :spamming
 void Server::cmdKick(Client &cli)
 {
-	(void)cli;
+	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	if (tokens.size() < 3)
+	{
+		std::cerr << "Error: not enough arguments for KICK" << std::endl;
+		return ; //!
+	}
+	std::string channel_name = tokens[1];
+	std::string nick = tokens[2];
+	std::string reason;
+	if (tokens.size() > 3)
+	{
+		if (tokens[3][0] != ':')
+		{
+			std::cerr << "Error: bad arguments for KICK, missing : before reason" << std::endl;
+			return ; //!
+		}
+		reason = tokens[3].substr(1, tokens[3].size());
+		for (size_t i = 4; i < tokens.size(); i++)
+			reason += tokens[i];
+	}
+	Channel *channel = NULL;
+	if (!this->findChannel(channel, channel_name))
+	{
+		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
+		return ; //! Channel doesn't exist
+	}
+	channel->kick(*channel->getClient(nick));
+	std::cout << nick << " kicked succesfully" << std::endl;
 }
 
 void Server::cmdPrivMsg(Client &cli)
@@ -480,8 +515,29 @@ void Server::cmdPrivMsg(Client &cli)
 // si le channel est invite-only seulement un operateur peut inviter
 void Server::cmdInvite(Client &cli)
 {
-	(void)cli;
-	std::cout << this->_channels[0] << std::endl;
+	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	if (tokens.size() != 3)
+	{
+		std::cerr << "Error: not enough arguments for INVITE" << std::endl;
+		return ; //!
+	}
+	std::string nick = tokens[1];
+	std::string channel_name = tokens[2];
+	Channel *channel = NULL;
+	if (!this->findChannel(channel, channel_name))
+	{
+		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
+		return ; //! Channel doesn't exist
+	}
+	for (size_t i = 0; i < this->_clients.size(); i++)
+	{
+		if (this->_clients[i].getNickname() == nick)
+		{
+			channel->invite(this->_clients[i]);
+			std::cout << nick << " invited to " << channel_name << std::endl;
+			break;
+		}
+	}
 }
 
 // TOPIC <channel> [:topic]
@@ -490,7 +546,36 @@ void Server::cmdInvite(Client &cli)
 // si channel +t alors le changement est op-only
 void Server::cmdTopic(Client &cli)
 {
-	(void)cli;
+	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	if (tokens.size() < 2)
+	{
+		std::cerr << "Error: not enough arguments for TOPIC" << std::endl;
+		return ; //!
+	}
+	std::string channel_name = tokens[1];
+	std::string topic;
+	Channel *channel = NULL;
+	if (!this->findChannel(channel, channel_name))
+	{
+		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
+		return ; //! Channel doesn't exist
+	}
+	if (tokens.size() == 2)
+	{
+		topic = channel->getTopic();
+		std::cout << "Topic is: " << topic << std::endl; //! a envoyer au client
+		return ;
+	}
+	if (tokens[2][0] != ':')
+	{
+		std::cerr << "Error: bad arguments for TOPIC, missing : before topic" << std::endl;
+		return ; //!
+	}
+	topic = tokens[2].substr(1, tokens[2].size());
+	for (size_t i = 3; i < tokens.size(); i++)
+		topic += tokens[i];
+	channel->setTopic(topic);
+	std::cout << "Topic set to: " << topic << std::endl;
 }
 
 int Server::findNickName(std::string nickName)
@@ -502,8 +587,6 @@ int Server::findNickName(std::string nickName)
 	}
 	return (0);
 }
-
-
 
 std::ostream& operator<<(std::ostream& dataStream, const std::vector<std::string>& vector) 
 {

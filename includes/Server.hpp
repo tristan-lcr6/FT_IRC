@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 16:41:32 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/27 12:06:28 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ class Server
 	Client &findClientByFd(int fd);
 	void execute(Client &cli);
 	int findNickName(std::string nickName);
+	bool findChannel(Channel *&channel, const std::string &channel_name);
 	void cmdPass(Client &myClient);
 	void cmdNick(Client &myClient);
 	void cmdUser(Client &myClient);
