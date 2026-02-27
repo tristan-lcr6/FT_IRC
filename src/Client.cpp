@@ -154,12 +154,3 @@ bool Client::operator!=(const Client &other)
 	return (false);
 }
 
-void Client::sendMessage(std::string& msg) const 
-{
-    if (this->_fd < 0)
-		 return;
-    if (send(this->_fd, msg.c_str(), msg.length(), 0) == -1) 
-	{
-        std::cerr << "Error while sending to client." << _nickName << std::endl;
-    }
-}

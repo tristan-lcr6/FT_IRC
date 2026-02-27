@@ -59,7 +59,7 @@ class Channel
 		void applyMode(char c, bool add); // applies the mode assigned to the char c
 		void applyMode(char c, bool add, std::string param); // applies the mode assigned to the char c with the params
 
-		void Channel::sendChannelMessage(Client & myClient, std::string message);
+		void sendChannelMessage(Client & myClient, std::string message);
 
 	};
 

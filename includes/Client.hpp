@@ -43,7 +43,7 @@ class Client
 	std::string getRealName() const;
 	int getFd() const;
 	bool operator!=(const Client &other);
-	void sendMessage(std::string& msg) const;
+	void sendMessageOnClientFd(std::string& msg) const;
 
 };
 

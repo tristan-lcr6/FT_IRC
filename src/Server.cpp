@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/26 19:34:57 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/02/27 17:49:19 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,7 +323,7 @@ void Server::cmdNick(Client &myClient)
 	nickname = (myClient.getBuffer()).substr(nameStart + 1);
 	if (isValidString(nickname))
 	{
-		if (!findNickName(nickname))
+		if (!findFdByNickName(nickname))
 		{
 			myClient.setNickName(nickname);
 				std::cout << myClient << std::endl;
@@ -482,46 +482,18 @@ void Server::cmdKick(Client &cli)
 	(void)cli;
 }
 
-void Server::cmdPrivMsg(Client &myClient)
-{
-	std::string message;
-	std::string contactName;
-	std::string cpy = myClient.getBuffer();
-	if(cpy.find(":") == std::string::npos)
-		std::cout << "Error :could not find ':' to start collect message" << std::endl;
-	message = cpy.substr(cpy.find(":") + 1);
-	cpy.erase(cpy.find(":") - 1);
-	std::vector<std::string> tokens;
-	tokens = split(cpy, " ");
-	if (tokens.size() != 2)
-	{
-		std::cout << "Error :Not a valid entry for Private Message." << std::endl;
-		return ;
-	}
-	contactName = tokens[1];
-	if(contactName.find("#"))
-	{
-		getChannel(contactName).sendChannelMessage(myClient, message);
-	}
-	else
-		findNickName(contactName);
-}
-Channel &Server::getChannel(std::string name)
-{
-	for (size_t i = 0; i < _channels.size();i++)
-	{
-		if(_channels[i].getName() == name)
-		{
-			return (_channels[i]);
-		}
-	}
-	std::cout << "Error :could not find channel named "<< name << std::endl;
-	return (_channels[0]);//! throw exception instead
-}
-
-
-
-
+// Channel &Server::getChannel(std::string Channelname)
+// {
+// 	for (size_t i = 0; i < _channels.size();i++)
+// 	{
+// 		if(_channels[i].getName() == Channelname)
+// 		{
+// 			return (_channels[i]);
+// 		}
+// 	}
+// 	std::cout << "Error :could not find channel named "<< Channelname << std::endl;
+// 	return (_channels[0]);//! throw exception instead
+// }
 
 
 
@@ -543,7 +515,7 @@ void Server::cmdTopic(Client &cli)
 	(void)cli;
 }
 
-int Server::findNickName(std::string nickName)
+int Server::findFdByNickName(std::string nickName)
 {
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
