@@ -28,7 +28,8 @@ Client &Client::operator=(const Client &other)
 		this->_authStatus = other.getAuthStatus();
 		this->_nickName = other.getNickName();
 		this->_userName = other.getUserName();
-
+		this->_buff = other.getBuffer();
+		this->_realName = other.getRealName();
 	}
 	return (*this);
 }

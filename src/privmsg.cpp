@@ -5,36 +5,41 @@
 #include "Client.hpp"
 #include "utils.hpp"
 
-std::vector<std::string> GetTokens(std::string &cpy)
+std::vector<std::string> GetTokens(std::string cpy, std::string &final)
 {
-	std::string message;
-	std::string formattedMsg;
-	if (cpy.find(":") == std::string::npos)
-		std::cout << "Error :could not find ':' to start collect message" << std::endl;
-	message = cpy.substr(cpy.find(":") + 1);
-	cpy.erase(cpy.find(":") - 1);
-	cpy = message;
-	return (split(cpy, " "));
+	size_t colonPos = cpy.find(":");
+	if (colonPos == std::string::npos)
+		return split(cpy, " ");
+	final = cpy.substr(colonPos + 1);
+	std::string header = cpy.substr(0, colonPos);
+	return split(header, " ");
 }
 
 void Server::cmdPrivMsg(Client &myClient)
 {
-	std::string target;
-	std::string cpy = myClient.getBuffer();
-	std::vector<std::string> tokens = GetTokens(cpy);
-	target = tokens[1];
-	std::string formattedMsg = ":" + myClient.getNickName() + " PRIVMSG " + target + " :" + +"\n";
-	std::cout << "Message send looks like this->" << formattedMsg << std::endl;
-	if (tokens.size() != 2)
+
+	std::string message;
+	std::string channelName;
+
+	std::string bufferCpy = myClient.getBuffer();
+
+	std::vector<std::string> tokens = GetTokens(bufferCpy, message);
+
+	if (tokens.size() < 2)
 	{
-		std::cout << "Error :Not a valid entry for Private Message." << std::endl;
+		std::cout << "Error: No target specified" << std::endl;
 		return;
 	}
+
+	std::string target = tokens[1];
+	std::string formattedMsg = ":" + myClient.getNickName() + " PRIVMSG " + target + " :" + message + "\r\n";
+	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
 	if (target[0] == '#')
 	{
+		channelName = target.substr(1);
 		try
 		{
-			getChannel(target).sendChannelMessage(myClient, formattedMsg);
+			getChannel(channelName).sendChannelMessage(myClient, formattedMsg);
 		}
 		catch (std::exception &e)
 		{
@@ -61,9 +66,10 @@ Channel &Server::getChannel(std::string Channelname)
 {
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		if (_channels[i].getName() == Channelname)
+		std::cout << _channels[i] << std::endl;//!
+		if (_channels[i]->getName() == Channelname)
 		{
-			return (_channels[i]);
+			return (*_channels[i]);
 		}
 	}
 	throw ServerException("!Error :could not find channel named  : " + Channelname); //! throw exception instead
@@ -79,9 +85,12 @@ void Client::sendMessageOnClientFd(std::string &msg) const
 
 void Channel::sendChannelMessage(Client &myClient, std::string message)
 {
+	std::cout << "vector of client in this channel is size =" << _clients.size() << std::endl;
 	for (size_t i = 0; i < _clients.size(); i++)
 	{
-		if (_clients[i] != myClient)
-			_clients[i].sendMessageOnClientFd(message);
+		if (_clients[i] != &myClient)
+		{
+			_clients[i]->sendMessageOnClientFd(message);
+		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/27 18:15:38 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/01 19:00:55 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class Server
 	std::string _password;
 	std::vector<Client> _clients;
 	std::vector<struct pollfd> _fds;
-	std::vector<Channel> _channels;
+	std::vector<Channel*> _channels;
 
   public:
 	Server(void);
@@ -87,6 +87,8 @@ class Server
 	void cmdInvite(Client &cli);
 	void cmdTopic(Client &cli);
 	void cmdPrivMsg(Client &cli);
+	void cmdTest(Client &myClient);
+
 
 	class ServerException : public std::exception
 	{

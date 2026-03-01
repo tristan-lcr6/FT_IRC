@@ -6,10 +6,9 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/01 13:40:57 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/01 19:31:40 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "Server.hpp"
 
@@ -19,15 +18,15 @@ bool Server::_signal = false;
 Server::Server(void) : _port(-1), _serSocketFd(-1), _password("")
 {
 	// std::cout << "Default constructor called" << std::endl;
-	return ;
+	return;
 }
 
 // Copy constructor
 Server::Server(const Server &other) : _port(other._port),
-	_serSocketFd(other._serSocketFd), _clients(other._clients), _fds(other._fds)
+									  _serSocketFd(other._serSocketFd), _clients(other._clients), _fds(other._fds)
 {
 	// std::cout << "Copy constructor called" << std::endl;
-	return ;
+	return;
 }
 
 // Assignment operator overload
@@ -45,7 +44,7 @@ Server &Server::operator=(const Server &other)
 Server::~Server(void)
 {
 	// std::cout << "Destructor called" << std::endl;
-	return ;
+	return;
 }
 
 void Server::clearClient(int fd)
@@ -55,7 +54,7 @@ void Server::clearClient(int fd)
 		if (this->_fds[i].fd == fd)
 		{
 			this->_fds.erase(this->_fds.begin() + i);
-			break ;
+			break;
 		}
 	}
 	for (size_t i = 0; i < this->_clients.size(); i++)
@@ -63,7 +62,7 @@ void Server::clearClient(int fd)
 		if (this->_clients[i].getFd() == fd)
 		{
 			this->_clients.erase(this->_clients.begin() + i);
-			break ;
+			break;
 		}
 	}
 }
@@ -71,7 +70,8 @@ void Server::clearClient(int fd)
 void Server::signalHandler(int signum)
 {
 	(void)signum;
-	std::cout << std::endl << "Signal Received!" << std::endl;
+	std::cout << std::endl
+			  << "Signal Received!" << std::endl;
 	Server::_signal = true;
 }
 
@@ -95,9 +95,9 @@ void Server::closeFds()
 
 void Server::serSocket()
 {
-	struct sockaddr_in	add;
-	struct pollfd		NewPoll;
-	int					en;
+	struct sockaddr_in add;
+	struct pollfd NewPoll;
+	int en;
 
 	add.sin_family = AF_INET; // ipv4
 	add.sin_port = htons(this->_port);
@@ -109,7 +109,7 @@ void Server::serSocket()
 		throw(std::runtime_error("failed to create socket"));
 	en = 1;
 	if (setsockopt(this->_serSocketFd, SOL_SOCKET, SO_REUSEADDR, &en,
-			sizeof(en)) == -1)
+				   sizeof(en)) == -1)
 		throw(std::runtime_error("failed to set option (SO_REUSEADDR) on socket"));
 	if (fcntl(this->_serSocketFd, F_SETFL, O_NONBLOCK) == -1)
 		throw(std::runtime_error("failed to set option (O_NONBLOCK) on socket"));
@@ -130,8 +130,7 @@ void Server::serverInit()
 	std::cout << "Waiting to accept a connection...\n";
 	while (Server::_signal == false)
 	{
-		if ((poll(&this->_fds[0], this->_fds.size(), -1) == -1)
-			&& Server::_signal == false)
+		if ((poll(&this->_fds[0], this->_fds.size(), -1) == -1) && Server::_signal == false)
 			throw(std::runtime_error("poll() failed"));
 		for (size_t i = 0; i < this->_fds.size(); i++)
 		{
@@ -149,23 +148,23 @@ void Server::serverInit()
 
 void Server::acceptNewClient()
 {
-	struct sockaddr_in	cliadd;
-	struct pollfd		NewPoll;
-	socklen_t			len;
-	Client				cli;
-	int					incofd;
+	struct sockaddr_in cliadd;
+	struct pollfd NewPoll;
+	socklen_t len;
+	Client cli;
+	int incofd;
 
 	len = sizeof(cliadd);
 	incofd = accept(this->_serSocketFd, (sockaddr *)&(cliadd), &len);
 	if (incofd == -1)
 	{
 		std::cout << "accept() failed" << std::endl;
-		return ;
+		return;
 	}
 	if (fcntl(incofd, F_SETFL, O_NONBLOCK) == -1)
 	{
 		std::cout << "fcntl() failed" << std::endl;
-		return ;
+		return;
 	}
 	NewPoll.fd = incofd;
 	NewPoll.events = POLLIN;
@@ -179,15 +178,15 @@ void Server::acceptNewClient()
 
 void Server::receiveNewData(int fd)
 {
-	Client	*myClient = NULL;
-	char	buff[1024];
-	size_t	end_start;
+	Client *myClient = NULL;
+	char buff[1024];
+	size_t end_start;
 
 	myClient = &findClientByFd(fd);
 	std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
 
 	//-> buffer for the received data
-	std::memset(buff, 0, sizeof(buff));                  //-> clear the buffer
+	std::memset(buff, 0, sizeof(buff));					 //-> clear the buffer
 	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1, 0); //-> receive the data
 	if (bytes <= 0)
 	{
@@ -205,10 +204,10 @@ void Server::receiveNewData(int fd)
 		{
 			end_start = (*myClient).getBuffer().find_first_of("\r\n");
 			(*myClient).setBuffer((*myClient).getBuffer().erase(end_start,
-					(*myClient).getBuffer().size()));
-			if(!myClient)
-				std::cout << RED << "Client lost" << END << std::endl;				
-			else 
+																(*myClient).getBuffer().size()));
+			if (!myClient)
+				std::cout << RED << "Client lost" << END << std::endl;
+			else
 				execute(*myClient);
 			(*myClient).clearBuffer();
 		}
@@ -240,11 +239,11 @@ Client &Server::findClientByFd(int fd)
 			return (*it);
 	}
 	// throw(std::exception);
-	return (*(_clients.end()));//!change
+	return (*(_clients.end())); //! change
 }
-static int	parse(std::string cmd)
+static int parse(std::string cmd)
 {
-	size_t	i;
+	size_t i;
 
 	if (cmd.empty())
 		return (-1);
@@ -254,44 +253,43 @@ static int	parse(std::string cmd)
 		name = cmd.substr(0, name_end);
 	else
 		name = cmd;
-	std::string commands[9] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG",
-		"MODE", "KICK", "INVITE", "TOPIC"};
+	std::string commands[10] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG",
+								"MODE", "KICK", "INVITE", "TOPIC", "1"};
 	i = 0;
-	while (i < 9 && name != commands[i])
+	while (i < 10 && name != commands[i])
 		++i;
 	return (i);
 }
 
 void Server::execute(Client &cli)
 {
-	int	cmdIdx;
+	int cmdIdx;
 
 	void (Server::*commands[])(Client &) = {&Server::cmdPass, &Server::cmdNick,
-		&Server::cmdUser, &Server::cmdJoin, &Server::cmdPrivMsg, &Server::cmdMode, &Server::cmdKick, &Server::cmdInvite, &Server::cmdTopic};
-	
+											&Server::cmdUser, &Server::cmdJoin, &Server::cmdPrivMsg, &Server::cmdMode, &Server::cmdKick, &Server::cmdInvite, &Server::cmdTopic, &Server::cmdTest};
+
 	cmdIdx = parse(cli.getBuffer());
-	if (cmdIdx < 0 || cmdIdx > 8)
+	if (cmdIdx < 0 || cmdIdx > 9)
 	{
 		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
-		return ; //! commande inconnue ou vide, faut voir quoi renvoyer
+		return; //! commande inconnue ou vide, faut voir quoi renvoyer
 	}
 	(this->*commands[cmdIdx])(cli);
-	return ;
+	return;
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
 	{
 		std::cerr << "Error tried to log without password" << std::endl;
-		return ; //! frerot faut mettre un mdp
+		return; //! frerot faut mettre un mdp
 	}
 	else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
 	{
 		std::cerr << "Error tried to cmd without log" << std::endl;
-		return ; //! frerot log toi
+		return; //! frerot log toi
 	}
 	else
 		// commands[cmdIdx](cli);
-		return ;
-	}
-
+		return;
+}
 
 void Server::cmdPass(Client &myClient)
 {
@@ -299,36 +297,48 @@ void Server::cmdPass(Client &myClient)
 	std::string passWord;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
 	if (nameStart == myClient.getBuffer().size())
-		return ;
+		return;
 	passWord = (myClient.getBuffer()).substr(nameStart + 1);
 	//?be more specifiques on the spaces rules for password
 	std::cout << "passWord is'" << passWord << "'" << std::endl;
 	if (passWord == _password)
 	{
-		myClient.setGrade(1);
+		myClient.setGrade(2);
 		std::cout << myClient << std::endl;
 	}
 	else
 		std::cout << "Error :wrong Password." << std::endl;
 }
 
+void Server::cmdTest(Client &myClient)
+{
+	std::cout << myClient << std::endl;
+	std::string passWord;
+	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
+	if (nameStart == myClient.getBuffer().size())
+		return;
+	passWord = (myClient.getBuffer()).substr(nameStart + 1);
+	//?be more specifiques on the spaces rules for password
+	myClient.setGrade(2);
+	myClient.setNickName(passWord);
+}
+
 void Server::cmdNick(Client &myClient)
 {
-				std::cout << myClient << std::endl;
+	std::cout << myClient << std::endl;
 	std::string nickname;
 	std::size_t nameStart = (myClient.getBuffer()).find_first_of(' ');
-	if (nameStart == myClient.getBuffer().size()
-		|| nameStart == std::string::npos)
-		return ;
+	if (nameStart == myClient.getBuffer().size() || nameStart == std::string::npos)
+		return;
 	nickname = (myClient.getBuffer()).substr(nameStart + 1);
 	if (isValidString(nickname))
 	{
-		if (!findFdByNickName(nickname))
+		if (findFdByNickName(nickname) == -1)
 		{
 			myClient.setNickName(nickname);
-				std::cout << myClient << std::endl;
+			std::cout << myClient << std::endl;
 		}
-		else 
+		else
 			std::cout << "Error : Nickame already used." << std::endl;
 	}
 	else
@@ -338,7 +348,7 @@ void Server::cmdUser(Client &myClient)
 {
 	std::string realname;
 	std::string cpy = myClient.getBuffer();
-	if(cpy.find(":") == std::string::npos)
+	if (cpy.find(":") == std::string::npos)
 		std::cout << "Error :could not find ':' to start collect realname" << std::endl;
 	realname = cpy.substr(cpy.find(":") + 1);
 	cpy.erase(cpy.find(":") - 1);
@@ -347,32 +357,30 @@ void Server::cmdUser(Client &myClient)
 	if (tokens.size() > 4 || tokens.size() < 2)
 	{
 		std::cout << "Error :Not a valid User entry." << std::endl;
-		return ;
+		return;
 	}
-	else if (myClient.getAuthStatus() == 1)
+	else if (myClient.getAuthStatus() == 1 || 2)
 	{
 		myClient.setRealName(realname);
 		myClient.setUserName(tokens[1]);
 		std::cout << myClient.getUserName() << " is now grade 2." << std::endl;
 		myClient.setGrade(2);
 		std::cout << myClient << std::endl;
-	
 	}
-	else 
+	else
 		std::cout << "Error :User Cannot get grade 2." << std::endl;
 }
 
-bool	isValidString(const std::string &str)
+bool isValidString(const std::string &str)
 {
-	char	c;
+	char c;
 
 	if (str.empty())
 		return (false);
 	for (size_t i = 0; i < str.length(); ++i)
 	{
 		c = str[i];
-		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0'
-					&& c <= '9') || c == '_'))
+		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_'))
 		{
 			return (false);
 		}
@@ -385,31 +393,40 @@ bool	isValidString(const std::string &str)
 // If it doesn't exist create it
 void Server::cmdJoin(Client &cli)
 {
+	std::string pass;
 	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	if (tokens.size() < 2)
+		return;
 	std::vector<std::string> channels = split(tokens[1], ',');
 	std::vector<std::string> passwords;
 	if (tokens.size() > 2)
 		passwords = split(tokens[2], ',');
 	for (std::size_t i = 0; i < channels.size(); i++)
 	{
-		bool found = false;
+
 		std::string name = channels[i];
+		bool found = false;
 		for (std::size_t j = 0; j < this->_channels.size(); j++)
 		{
-			if (name == this->_channels[j].getName())
+			
+			if (name == this->_channels[j]->getName())
 			{
-				if (i < passwords.size() && !passwords[i].empty())
-					this->_channels[j].join(cli, passwords[i]);
+				if (i < passwords.size())
+					pass = passwords[i];
 				else
-					this->_channels[j].join(cli);
+					pass = ""; //!change password handling ?
+				this->_channels[j]->join(cli, pass);
+				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
 				found = true;
 				break;
 			}
 		}
 		if (!found)
 		{
-			this->_channels.push_back(Channel(cli, name));
-			std::cout << "Channel " << name << " created" << std::endl;
+			Channel *newChan = new Channel(cli, name);
+			this->_channels.push_back(newChan);
+			// std::cout << "Channel " << name << " created and client added." << std::endl;
+			std::cout << *newChan << std::endl;
 		}
 	}
 }
@@ -430,9 +447,9 @@ void Server::cmdMode(Client &cli)
 	Channel *channel;
 	for (std::size_t i = 0; i < this->_channels.size(); i++)
 	{
-		if (channel_name == this->_channels[i].getName())
+		if (channel_name == this->_channels[i]->getName())
 		{
-			channel = &this->_channels[i];
+			channel = this->_channels[i];
 			found = true;
 			break;
 		}
@@ -440,12 +457,13 @@ void Server::cmdMode(Client &cli)
 	if (!found)
 	{
 		std::cerr << "Error: tried to mode an unknown channel: " << channel_name << std::endl;
-		return ; //! Channel doesn't exist
+		return; //! Channel doesn't exist
 	}
 	std::string modestring = tokens[2];
 	std::vector<std::string> params;
 	if (tokens.size() > 3)
-		params.assign(tokens.begin() + 3, tokens.end());;
+		params.assign(tokens.begin() + 3, tokens.end());
+	;
 	std::size_t paramIdx = 0;
 	bool add = true;
 	for (size_t i = 0; i < modestring.size(); ++i)
@@ -464,9 +482,9 @@ void Server::cmdMode(Client &cli)
 		if (Channel::modeWithParam(c, add))
 		{
 			if (paramIdx >= params.size())
-            {
+			{
 				std::cerr << "Error: the mode " << c << " needs params" << std::endl;
-				return ; //! error not enough params
+				return; //! error not enough params
 			}
 			channel->applyMode(c, add, params[paramIdx++]);
 		}
@@ -495,9 +513,6 @@ void Server::cmdKick(Client &cli)
 // 	return (_channels[0]);//! throw exception instead
 // }
 
-
-
-
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
 void Server::cmdInvite(Client &cli)
@@ -525,17 +540,17 @@ int Server::findFdByNickName(std::string nickName)
 	return (-1);
 }
 
-
-
-std::ostream& operator<<(std::ostream& dataStream, const std::vector<std::string>& vector) 
+std::ostream &operator<<(std::ostream &dataStream, const std::vector<std::string> &vector)
 {
-    dataStream << "[";
-    for (size_t i = 0; i < vector.size(); ++i) {
-        dataStream << vector[i];
-        if (i != vector.size() - 1) {
-            dataStream << ", ";
-        }
-    }
-    dataStream << "]";
-    return dataStream;
+	dataStream << "[";
+	for (size_t i = 0; i < vector.size(); ++i)
+	{
+		dataStream << vector[i];
+		if (i != vector.size() - 1)
+		{
+			dataStream << ", ";
+		}
+	}
+	dataStream << "]";
+	return dataStream;
 }
