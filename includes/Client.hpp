@@ -45,6 +45,19 @@ class Client
 	bool operator!=(const Client &other);
 	void sendMessageOnClientFd(std::string& msg) const;
 
+	class ClientException : public std::exception
+	{
+		private : 
+		 	std::string _mess;
+		public :
+		ClientException(std::string mess) : _mess(mess){}
+		virtual ~ClientException() throw() {}
+        virtual const char* what() const throw() 
+        {
+            return _mess.c_str();
+        }
+	};
+
 };
 
 std::ostream &operator<<(std::ostream &os, const Client &c);

@@ -6,7 +6,7 @@
 /*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/27 17:49:19 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/01 13:40:57 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -522,7 +522,7 @@ int Server::findFdByNickName(std::string nickName)
 		if (_clients[i].getNickName() == nickName)
 			return (_clients[i].getFd());
 	}
-	return (0);
+	return (-1);
 }
 
 
