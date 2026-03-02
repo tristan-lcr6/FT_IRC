@@ -113,7 +113,7 @@ void Channel::removeClientLimit()
 
 void Channel::addOperator(Client *cli)
 {
-	this->_operators.push_back(&cli);
+	this->_operators.push_back(cli);
 }
 
 void Channel::addOperator(std::string nick)

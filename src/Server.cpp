@@ -3,13 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:41:46 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/01 19:31:40 by tlecuyer         ###   ########.fr       */
-/*   Updated: 2026/02/27 12:06:17 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/02 13:14:37 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Server.hpp"
 
@@ -493,9 +493,9 @@ bool Server::findChannel(Channel *&channel, const std::string &channel_name)
 {
 	for (std::size_t i = 0; i < this->_channels.size(); i++)
 	{
-		if (channel_name == this->_channels[i].getName())
+		if (channel_name == this->_channels[i]->getName())
 		{
-			channel = &this->_channels[i];
+			channel = this->_channels[i];
 			return true;
 		}
 	}
@@ -532,7 +532,7 @@ void Server::cmdKick(Client &cli)
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
 		return ; //! Channel doesn't exist
 	}
-	channel->kick(*channel->getClient(nick));
+	channel->kick(channel->getClient(nick));
 	std::cout << nick << " kicked succesfully" << std::endl;
 }
 
