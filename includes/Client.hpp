@@ -18,23 +18,32 @@ class Client
 	std::string _buff;
 
   public:
+  	// ************************************************************************** //
+	// Constructor / Destructor
+	// ************************************************************************** //
 	Client();
 	Client(int fd);
 	Client(const Client &other);
 	Client &operator=(const Client &other);
 	~Client();
+
+	// ************************************************************************** //
+	// Setters
+	// ************************************************************************** //
+
 	int setFd(int fd);
 	std::string setIp(std::string ip);
-	const std::string &getNickname(void) const;
-	void addBuff(std::string data);
-	std::string setBuffer(std::string str);
-	// void eraseBuffer(size_t start, size_t size);
-	void clearBuffer();
-	bool operator==(const Client &c);
 	void setGrade(int i);
 	void setNickName(std::string name);
 	void setRealName(std::string name);
 	void setUserName(std::string name);
+	std::string setBuffer(std::string str);
+
+	// ************************************************************************** //
+	// Getters
+	// ************************************************************************** //
+
+	const std::string &getNickname(void) const;
 	int getAuthStatus() const;
 	std::string getIp() const;
 	std::string getNickName() const;
@@ -42,8 +51,23 @@ class Client
 	std::string getBuffer() const;
 	std::string getRealName() const;
 	int getFd() const;
-	bool operator!=(const Client &other);
+	
+	// ************************************************************************** //
+	// Buffer management
+	// ************************************************************************** //
+
+	void addBuff(std::string data);
+	// void eraseBuffer(size_t start, size_t size);
+	void clearBuffer();
+	
+	// ************************************************************************** //
+	// Message management
+	// ************************************************************************** //
+
 	void sendMessageOnClientFd(std::string& msg) const;
+	
+	bool operator!=(const Client &other);
+	bool operator==(const Client &c);
 
 	class ClientException : public std::exception
 	{
