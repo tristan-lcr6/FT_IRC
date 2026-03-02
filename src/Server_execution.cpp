@@ -1,5 +1,11 @@
 #include "Server.hpp"
 
+
+// void Server::addToBuff(std::string data, Client &myClient)
+// {
+// 	myClient.addBuff(data);
+// }
+
 static int parse(std::string cmd)
 {
 	size_t i;
@@ -33,6 +39,7 @@ void Server::execute(Client &cli)
 		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
 		return; //! commande inconnue ou vide, faut voir quoi renvoyer
 	}
+	try {
 	int pre_auth = cli.getAuthStatus();
 	(this->*commands[cmdIdx])(cli);
 	int post_auth = cli.getAuthStatus();
@@ -45,13 +52,12 @@ void Server::execute(Client &cli)
 	return;
 	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
 	{
-		std::cerr << "Error tried to log without password" << std::endl;
-		return; //! frerot faut mettre un mdp
+		(this->*commands[cmdIdx])(cli);
 	}
-	else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
+  }
+	catch (std::exception &e) 
 	{
-		std::cerr << "Error tried to cmd without log" << std::endl;
-		return; //! frerot log toi
+		std::cout << e.what() << std::endl;
 	}
 	else
 		// commands[cmdIdx](cli);

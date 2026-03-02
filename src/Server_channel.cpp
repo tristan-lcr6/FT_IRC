@@ -1,5 +1,26 @@
 #include "Server.hpp"
 
+
+void Server::JoinMessage(std::string channelName, Client &cli)
+{
+cli.sendMessageOnClientFd(cli.getPrefix() + " JOIN " + channelName);
+cli.sendMessageOnClientFd(cli.getPrefix() + " 332 " + channelName " :Bienvenue sur " + channelName);
+    
+
+    // 3. Envoyer l'info du Topic (RPL_TOPICWHOTIME 333 - Optionnel mais Irssi adore)
+    cli.reply(":" + serverName + " 333 " + nick + " " + channelName + " " + nick + " 1672531200");
+
+    // 4. Envoyer la liste des noms (RPL_NAMREPLY 353)
+    // Ici tu dois boucler sur tous les membres du channel pour construire la liste
+    std::string list = "@" + nick + " member2 member3"; 
+    cli.reply(":" + serverName + " 353 " + nick + " = " + channelName + " :" + list);
+
+    // 5. Finir la liste (RPL_ENDOFNAMES 366) - CRUCIAL
+    cli.reply(":" + serverName + " 366 " + nick + " " + channelName + " :End of /NAMES list");
+}
+
+
+
 // JOIN #a,#b,#c passA,passB,passC
 // If the channel exists and can join, joins it
 // If it doesn't exist create it
@@ -17,6 +38,8 @@ void Server::cmdJoin(Client &cli)
 	{
 
 		std::string name = channels[i];
+		if(name[0] != '#')
+			throw ServerException("Cannot find '#' to start channel name.");
 		bool found = false;
 		for (std::size_t j = 0; j < this->_channels.size(); j++)
 		{
@@ -29,6 +52,7 @@ void Server::cmdJoin(Client &cli)
 					pass = ""; //!change password handling ?
 				this->_channels[j]->join(cli, pass);
 				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
+				
 				found = true;
 				break;
 			}
