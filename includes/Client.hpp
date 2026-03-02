@@ -52,6 +52,7 @@ class Client
 	std::string getBuffer() const;
 	std::string getRealName() const;
 	int getFd() const;
+	std::string getPrefix() const;
 	
 	// ************************************************************************** //
 	// Buffer management
