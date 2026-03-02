@@ -255,8 +255,6 @@ void Channel::kick(Client &cli)
 	this->removeOperator(&cli);
 }
 
-
-
 void Channel::invite(Client &cli)
 {
 	this->_invite_list.push_back(&cli);
