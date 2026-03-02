@@ -1,25 +1,23 @@
 #include "Server.hpp"
 
+void Server::JoinMessage(std::string channelName, Client &cli)
+{
 
-// void Server::JoinMessage(std::string channelName, Client &cli)
-// {
-// cli.sendMessageOnClientFd(cli.getPrefix() + " JOIN " + channelName);
-// cli.sendMessageOnClientFd(cli.getPrefix() + " 332 " + channelName " :Bienvenue sur " + channelName);
-    
+	std::string nick = cli.getNickName();
+	std::string user = cli.getUserName();
+	std::string host = "localhost"; // Ou l'IP réelle
+	std::string serverName = "irc.42.fr";
+	std::string const prefix = cli.getPrefix();
+	cli.sendMessageOnClientFd(prefix + " JOIN " + channelName);
+	cli.sendMessageOnClientFd(prefix + " 332 " + channelName + " :Bienvenue sur " + channelName);
+	cli.sendMessageOnClientFd(":" + serverName + " 333 " + nick + " " + channelName + " " + nick + " 1672531200");
 
-//     // 3. Envoyer l'info du Topic (RPL_TOPICWHOTIME 333 - Optionnel mais Irssi adore)
-//     cli.reply(":" + serverName + " 333 " + nick + " " + channelName + " " + nick + " 1672531200");
-
-//     // 4. Envoyer la liste des noms (RPL_NAMREPLY 353)
-//     // Ici tu dois boucler sur tous les membres du channel pour construire la liste
-//     std::string list = "@" + nick + " member2 member3"; 
-//     cli.reply(":" + serverName + " 353 " + nick + " = " + channelName + " :" + list);
-
-//     // 5. Finir la liste (RPL_ENDOFNAMES 366) - CRUCIAL
-//     cli.reply(":" + serverName + " 366 " + nick + " " + channelName + " :End of /NAMES list");
-// }
-
-
+	// 4. Envoyer la liste des noms (RPL_NAMsendMessageOnClientFd 353)
+	// Ici tu dois boucler sur tous les membres du channel pour construire la liste
+	// std::string list = "@" + nick + " member2 member3";
+	// cli.sendMessageOnClientFd(":" + serverName + " 353 " + nick + " = " + channelName + " :" + list);
+	// cli.sendMessageOnClientFd(":" + serverName + " 366 " + nick + " " + channelName + " :End of /NAMES list");
+}
 
 // JOIN #a,#b,#c passA,passB,passC
 // If the channel exists and can join, joins it
@@ -38,21 +36,22 @@ void Server::cmdJoin(Client &cli)
 	{
 
 		std::string name = channels[i];
-		if(name[0] != '#')
+		if (name[0] != '#')
 			throw ServerException("Cannot find '#' to start channel name.");
 		bool found = false;
 		for (std::size_t j = 0; j < this->_channels.size(); j++)
 		{
-			
+
 			if (name == this->_channels[j]->getName())
 			{
 				if (i < passwords.size())
 					pass = passwords[i];
 				else
-					pass = ""; //!change password handling ?
+					pass = ""; //! change password handling ?
 				this->_channels[j]->join(cli, pass);
 				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
-				
+				JoinMessage(name, cli);
+
 				found = true;
 				break;
 			}
@@ -63,6 +62,8 @@ void Server::cmdJoin(Client &cli)
 			this->_channels.push_back(newChan);
 			// std::cout << "Channel " << name << " created and client added." << std::endl;
 			std::cout << *newChan << std::endl;
+			JoinMessage(name, cli);
+
 		}
 	}
 }
@@ -80,7 +81,7 @@ void Server::cmdMode(Client &cli)
 	if (tokens.size() < 3)
 	{
 		std::cerr << "Error: not enough arguments for MODE" << std::endl;
-		return ; //!
+		return; //!
 	}
 	std::string channel_name = tokens[1];
 	std::cout << "Moding " << channel_name << " channel" << std::endl;
@@ -124,7 +125,6 @@ void Server::cmdMode(Client &cli)
 	}
 }
 
-
 // KICK <channel> <nick> [:reason]
 // KICK #test john :spamming
 void Server::cmdKick(Client &cli)
@@ -133,7 +133,7 @@ void Server::cmdKick(Client &cli)
 	if (tokens.size() < 3)
 	{
 		std::cerr << "Error: not enough arguments for KICK" << std::endl;
-		return ; //!
+		return; //!
 	}
 	std::string channel_name = tokens[1];
 	std::string nick = tokens[2];
@@ -143,7 +143,7 @@ void Server::cmdKick(Client &cli)
 		if (tokens[3][0] != ':')
 		{
 			std::cerr << "Error: bad arguments for KICK, missing : before reason" << std::endl;
-			return ; //!
+			return; //!
 		}
 		reason = tokens[3].substr(1, tokens[3].size());
 		for (size_t i = 4; i < tokens.size(); i++)
@@ -153,7 +153,7 @@ void Server::cmdKick(Client &cli)
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
-		return ; //! Channel doesn't exist
+		return; //! Channel doesn't exist
 	}
 	channel->kick(*channel->getClient(nick));
 	std::cout << nick << " kicked succesfully" << std::endl;
@@ -180,7 +180,7 @@ void Server::cmdInvite(Client &cli)
 	if (tokens.size() != 3)
 	{
 		std::cerr << "Error: not enough arguments for INVITE" << std::endl;
-		return ; //!
+		return; //!
 	}
 	std::string nick = tokens[1];
 	std::string channel_name = tokens[2];
@@ -188,11 +188,11 @@ void Server::cmdInvite(Client &cli)
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
-		return ; //! Channel doesn't exist
+		return; //! Channel doesn't exist
 	}
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i].getNickname() == nick)
+		if (this->_clients[i].getNickName() == nick)
 		{
 			channel->invite(this->_clients[i]);
 			std::cout << nick << " invited to " << channel_name << std::endl;
@@ -211,7 +211,7 @@ void Server::cmdTopic(Client &cli)
 	if (tokens.size() < 2)
 	{
 		std::cerr << "Error: not enough arguments for TOPIC" << std::endl;
-		return ; //!
+		return; //!
 	}
 	std::string channel_name = tokens[1];
 	std::string topic;
@@ -219,18 +219,18 @@ void Server::cmdTopic(Client &cli)
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
-		return ; //! Channel doesn't exist
+		return; //! Channel doesn't exist
 	}
 	if (tokens.size() == 2)
 	{
 		topic = channel->getTopic();
 		std::cout << "Topic is: " << topic << std::endl; //! a envoyer au client
-		return ;
+		return;
 	}
 	if (tokens[2][0] != ':')
 	{
 		std::cerr << "Error: bad arguments for TOPIC, missing : before topic" << std::endl;
-		return ; //!
+		return; //!
 	}
 	topic = tokens[2].substr(1, tokens[2].size());
 	for (size_t i = 3; i < tokens.size(); i++)
@@ -238,10 +238,6 @@ void Server::cmdTopic(Client &cli)
 	channel->setTopic(topic);
 	std::cout << "Topic set to: " << topic << std::endl;
 }
-
-
-
-
 
 static std::vector<std::string> GetTokens(std::string cpy, std::string &final)
 {
@@ -266,11 +262,11 @@ void Server::cmdPrivMsg(Client &myClient)
 		return;
 	}
 	std::string target = tokens[1];
-	std::string formattedMsg = ":" + myClient.getNickName() + " PRIVMSG " + target + " :" + message + "\r\n";
+	std::string formattedMsg = ":" + myClient.getNickName() + " PRIVMSG " + target + " :" + message;
 	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
 	if (target[0] == '#')
 	{
-		channelName = target.substr(1);
+		channelName = target;
 		try
 		{
 			getChannel(channelName).sendChannelMessage(myClient, formattedMsg);

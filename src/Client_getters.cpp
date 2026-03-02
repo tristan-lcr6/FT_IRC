@@ -10,9 +10,9 @@ std::string Client::getIp(void) const
 	return (this->_IP);
 }
 
-const std::string &Client::getNickname(void) const
+std::string Client::getNickName(void) const
 {
-	return this->_nickName;
+	return (this->_nickName);
 }
 
 std::string Client::getBuffer(void) const
@@ -23,11 +23,6 @@ std::string Client::getBuffer(void) const
 int Client::getAuthStatus() const
 {
 	return (this->_authStatus);
-}
-
-std::string Client::getNickName() const
-{
-	return (_nickName);
 }
 
 std::string Client::getUserName() const

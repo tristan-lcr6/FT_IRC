@@ -171,7 +171,7 @@ Client *Channel::getClient(std::string nick)
 {
 	for (std::size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i]->getNickname() == nick)
+		if (this->_clients[i]->getNickName() == nick)
 			return (this->_clients[i]);
 	}
 	std::cerr << "Client " << nick << " not found in channel " << this->_name << std::endl;
@@ -200,7 +200,7 @@ void Channel::join(Client &cli)
 				return ;
 			}
 		}
-		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickname() << ") are not invited" << std::endl;
+		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickName() << ") are not invited" << std::endl;
 		return ; //! erreur n'est pas invite
 	}
 	this->_clients.push_back(&cli);
@@ -228,7 +228,7 @@ void Channel::join(Client &cli, std::string pwd)
 				return ;
 			}
 		}
-		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickname() << ") are not invited" << std::endl;
+		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickName() << ") are not invited" << std::endl;
 		return ; //! erreur n'est pas invite
 	}
 	this->_clients.push_back(&cli);
@@ -339,7 +339,7 @@ std::ostream &operator<<(std::ostream &os, const Channel &channel)
 	os << "Clients (Addresses) [" << channel._clients.size() << "]: " << std::endl;
 	for (size_t i = 0; i < channel._clients.size(); ++i)
 	{
-		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickname() << ")" << std::endl;
+		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickName() << ")" << std::endl;
 	}
 
 	os << "Operators (Addresses) [" << channel._operators.size() << "]: " << std::endl;
