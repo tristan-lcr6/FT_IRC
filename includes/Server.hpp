@@ -105,6 +105,7 @@ public:
     void cmdJoin(Client &cli);
     void JoinMessage(std::string channelName, Client &cli);
     void cmdMode(Client &cli);
+	void broadcastNick(Client &cli, std::string &nick);
     void cmdKick(Client &cli);
     void cmdInvite(Client &cli);
     void cmdTopic(Client &cli);

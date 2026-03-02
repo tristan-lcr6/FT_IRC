@@ -46,7 +46,7 @@ void Server::execute(Client &cli)
 		if (pre_auth < 2 && post_auth == 2)
 		{
 			// :nom_serveur 001 nick :Welcome to the Internet Relay Network nick!user@host
-			std::string msg = ":ft_irc 001 " + cli.getNickName() + " :Welcome to the Internet Relay Network " + cli.getPrefix();
+			std::string msg = ":ft_irc 001 " + cli.getNickName() + " :Welcome to the Internet Relay Network " + cli.getPrefix() + "\n";
 			cli.sendMessageOnClientFd(msg);
 		}
 		return;
