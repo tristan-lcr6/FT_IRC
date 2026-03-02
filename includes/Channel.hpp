@@ -41,6 +41,14 @@ public:
 	void setClientLimit(int limit);				// sets l_mode to true and client_limit to limit
 	void setClientLimit(std::string limit_str); // sets l_mode to true and client_limit to limit
 	void removeClientLimit();					// sets l_mode to false and client_limit to -1
+		void setClientLimit(size_t limit); // sets l_mode to true and client_limit to limit
+		void setClientLimit(std::string limit_str); // sets l_mode to true and client_limit to limit
+		void removeClientLimit(); // sets l_mode to false and client_limit to -1
+
+		void addOperator(Client *cli); // adds cli to operators
+		void addOperator(std::string nick); // adds the client with the nickname nick to operators
+		void removeOperator(Client *cli); // removes cli from operators
+		void removeOperator(std::string nick); // removes the client with the nickname nick from operators
 
 	void addOperator(Client &cli);		   // adds cli to operators
 	void addOperator(std::string nick);	   // adds the client with the nickname nick to operators
@@ -64,6 +72,17 @@ public:
 	bool isClientInChannel(Client &cli) const;
 
 	friend std::ostream &operator<<(std::ostream &os, const Channel &channel);
+		const std::string &getTopic(void) const; // returns topic
+		void setTopic(std::string topic); // sets the topic
+		const std::string &getName(void) const; // returns name
+		Client *getClient(std::string nick); // returns the client corresponding to the nickname
+		
+		void join(Client &cli); // checks if the client can join and adds it to the clients list
+		void join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
+		void kick(Client &cli);
+		void invite(Client &cli); // adds client to the invite list if i_mode is enabled
+		void applyMode(char c, bool add); // applies the mode assigned to the char c
+		void applyMode(char c, bool add, std::string param); // applies the mode assigned to the char c with the params
 };
 
 #include <iostream>
