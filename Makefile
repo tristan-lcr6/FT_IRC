@@ -5,7 +5,7 @@ BONUS_ARGS =
 
 # Source files
 SRC_DIR = src/
-SRC_FILES = main.cpp Server.cpp Client.cpp Channel.cpp utils.cpp privmsg.cpp Server_core.cpp Server_data_managment.cpp Server_execution.cpp Server_command.cpp Server_channel.cpp
+SRC_FILES = main.cpp Server.cpp Client_buffer.cpp Client_OCF.cpp Server_core.cpp Server_data_managment.cpp Server_execution.cpp Server_command.cpp Server_channel.cpp Client_getters.cpp Client_operators.cpp Client_setters.cpp Channel_client-op.cpp Channel_getters.cpp Channel_inv-tpc-psw-lim.cpp Channel_mode.cpp Channel_OCF.cpp utils.cpp privmsg.cpp
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 SRC_BONUS_FILES = 
 SRC_BONUS = $(addprefix $(SRC_DIR), $(SRC_BONUS_FILES))

@@ -50,7 +50,6 @@ public:
 	void join(Client &cli);								 // checks if the client can join and adds it to the clients list
 	void join(Client &cli, std::string pwd);			 // checks if the client can join and the password is right and adds it to the clients list
 	void kick(Client &cli);
-	
 
 	// ************************************************************************** //
 	// Operator management
