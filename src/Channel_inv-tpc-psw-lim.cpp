@@ -49,3 +49,8 @@ void Channel::invite(Client &cli)
 {
 	this->_invite_list.push_back(&cli);
 }
+
+void Channel::setInviteOnly(bool b)
+{
+	this->_i_mode = b;
+}

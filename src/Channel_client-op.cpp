@@ -116,3 +116,4 @@ void Channel::kick(Client &cli)
 	}
 	this->removeOperator(&cli);
 }
+

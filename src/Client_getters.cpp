@@ -39,3 +39,4 @@ std::string Client::getRealName() const
 {
 	return (_realName);
 }
+

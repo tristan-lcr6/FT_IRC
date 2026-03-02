@@ -274,33 +274,33 @@ bool Channel::modeWithParam(char c, bool add)
 	return false;
 }
 
-void Channel::applyMode(char c, bool add)
-{
-	if (modeWithParam(c, add))
-	{
-		std::cerr << "Error: tried to apply mode " << c << " without params" << std::endl;
-		return; //! error mode needs param
-	}
-	switch (c)
-	{
-	case 'i':
-		this->setInviteOnly(add);
-		break;
-	case 't':
-		this->setTopicOpOnly(add);
-		break;
-	case 'k':
-		this->removePassword();
-		break;
-	case 'l':
-		this->removeClientLimit();
-		break;
-	default:
-		std::cerr << "Error: tried to apply an unknown mode: " << c << std::endl;
-		//! error unknown mode
-		break;
-	}
-}
+// void Channel::applyMode(char c, bool add)
+// {
+// 	if (modeWithParam(c, add))
+// 	{
+// 		std::cerr << "Error: tried to apply mode " << c << " without params" << std::endl;
+// 		return; //! error mode needs param
+// 	}
+// 	switch (c)
+// 	{
+// 	case 'i':
+// 		this->setInviteOnly(add);
+// 		break;
+// 	case 't':
+// 		this->setTopicOpOnly(add);
+// 		break;
+// 	case 'k':
+// 		this->removePassword();
+// 		break;
+// 	case 'l':
+// 		this->removeClientLimit();
+// 		break;
+// 	default:
+// 		std::cerr << "Error: tried to apply an unknown mode: " << c << std::endl;
+// 		//! error unknown mode
+// 		break;
+// 	}
+// }
 
 void Channel::applyMode(char c, bool add, std::string param)
 {

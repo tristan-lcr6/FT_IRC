@@ -26,6 +26,7 @@ class Client
 	Client(const Client &other);
 	Client &operator=(const Client &other);
 	~Client();
+	
 
 	// ************************************************************************** //
 	// Setters
@@ -63,7 +64,6 @@ class Client
 	// ************************************************************************** //
 	// Message management
 	// ************************************************************************** //
-
 	void sendMessageOnClientFd(std::string& msg) const;
 	
 	bool operator!=(const Client &other);

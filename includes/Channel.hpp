@@ -90,7 +90,6 @@ public:
 	// ************************************************************************** //
 	// Messaging
 	// ************************************************************************** //
-
 	void sendChannelMessage(Client &myClient, std::string message);//sen message to all client in named channel
 
 
