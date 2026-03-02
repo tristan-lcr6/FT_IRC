@@ -26,7 +26,6 @@ public:
 	// ************************************************************************** //
 	// Constructors / Destructor
 	// ************************************************************************** //
-
 	Channel(void);
 	Channel(Client &cli, std::string name); // constructor that puts cli as the first operator
 	Channel(const Channel &other);
@@ -36,7 +35,6 @@ public:
 	// ************************************************************************** //
 	// Getters
 	// ************************************************************************** //
-
 	bool isInviteOnly(void) const;	// returns i_mode
 	bool isTopicOpOnly(void) const; // returns t_mode
 	bool hasKey(void) const;		// returns k_mode
