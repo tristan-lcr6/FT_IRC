@@ -1,5 +1,16 @@
 #include "Server.hpp"
 
+void Server::capLs(Client &cli)
+{
+	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	if (tokens.size() != 2 || tokens[0] != "CAP" || tokens[1] != "LS")
+	{
+		std::cerr << "Error: expected CAP LS" << std::endl;
+		return ; //!
+	}
+	std::string msg = "CAP * LS";
+	cli.sendMessageOnClientFd(msg);
+}
 
 void Server::cmdPass(Client &myClient)
 {

@@ -40,3 +40,7 @@ std::string Client::getRealName() const
 	return (_realName);
 }
 
+std::string Client::getPrefix() const
+{
+    return this->_nickName + "!" + this->_userName + "@" + this->_IP;
+}

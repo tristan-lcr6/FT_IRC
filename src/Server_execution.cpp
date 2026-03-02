@@ -1,4 +1,3 @@
-
 #include "Server.hpp"
 
 
@@ -19,7 +18,7 @@ static int parse(std::string cmd)
 		name = cmd.substr(0, name_end);
 	else
 		name = cmd;
-	std::string commands[10] = {"PASS", "NICK", "USER", "JOIN", "PRIVMSG",
+	std::string commands[11] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
 								"MODE", "KICK", "INVITE", "TOPIC", "1"};
 	i = 0;
 	while (i < 10 && name != commands[i])
@@ -27,40 +26,40 @@ static int parse(std::string cmd)
 	return (i);
 }
 
-
 void Server::execute(Client &cli)
 {
 	int cmdIdx;
 
-	void (Server::*commands[])(Client &) = {&Server::cmdPass, &Server::cmdNick,
+	void (Server::*commands[])(Client &) = {&Server::capLs, &Server::cmdPass, &Server::cmdNick,
 											&Server::cmdUser, &Server::cmdJoin, &Server::cmdPrivMsg, &Server::cmdMode, &Server::cmdKick, &Server::cmdInvite, &Server::cmdTopic, &Server::cmdTest};
 
 	cmdIdx = parse(cli.getBuffer());
-	if (cmdIdx < 0 || cmdIdx > 9)
+	if (cmdIdx < 0 || cmdIdx > 10)
 	{
 		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
 		return; //! commande inconnue ou vide, faut voir quoi renvoyer
 	}
-	try 
+	try {
+	int pre_auth = cli.getAuthStatus();
+	(this->*commands[cmdIdx])(cli);
+	int post_auth = cli.getAuthStatus();
+	if (pre_auth < 2 && post_auth == 2)
+	{
+		// :nom_serveur 001 nick :Welcome to the Internet Relay Network nick!user@host
+		std::string msg = ":ft_irc 001 " + cli.getNickName() + " :Welcome to the Internet Relay Network " + cli.getPrefix();
+		cli.sendMessageOnClientFd(msg);
+	}
+	return;
+	if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
 	{
 		(this->*commands[cmdIdx])(cli);
 	}
+  }
 	catch (std::exception &e) 
 	{
 		std::cout << e.what() << std::endl;
 	}
-	// return;
-	// if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
-	// {
-	// 	std::cerr << "Error tried to log without password" << std::endl;
-	// 	return; //! frerot faut mettre un mdp
-	// }
-	// else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
-	// {
-	// 	std::cerr << "Error tried to cmd without log" << std::endl;
-	// 	return; //! frerot log toi
-	// }
-	// else
-	// 	// commands[cmdIdx](cli);
-	// 	return;
+	else
+		// commands[cmdIdx](cli);
+		return;
 }

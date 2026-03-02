@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/02 16:04:51 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/02 16:41:19 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ public:
     // ************************************************************************** //
     // --- IRC Commands (Dossier commands/) ---
     // ************************************************************************** //
+    void capLs(Client &cli);
     void cmdPass(Client &cli);
     void cmdNick(Client &cli);
     void cmdUser(Client &cli);
