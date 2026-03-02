@@ -28,7 +28,8 @@ Client &Client::operator=(const Client &other)
 		this->_authStatus = other.getAuthStatus();
 		this->_nickName = other.getNickName();
 		this->_userName = other.getUserName();
-
+		this->_buff = other.getBuffer();
+		this->_realName = other.getRealName();
 	}
 	return (*this);
 }
@@ -116,6 +117,20 @@ std::string Client::getUserName() const
 	return (_userName);
 }
 
+void Client::setRealName(std::string name)
+{
+	this->_realName = name;
+}
+
+void Client::setUserName(std::string name)
+{
+	this->_userName = name;
+}
+
+std::string Client::getRealName() const
+{
+	return (_realName);
+}
 
 
 
@@ -125,8 +140,18 @@ std::ostream &operator<<(std::ostream &os, const Client &c)
 	os << "FD          : " << c.getFd() << std::endl;
 	os << "IP          : " << c.getIp() << std::endl;
 	os << "Nickname    : " << (c.getNickName().empty() ? "(none)" : c.getNickName()) << std::endl;
+	os << "UserName    : " << (c.getUserName().empty() ? "(none)" : c.getUserName()) << std::endl;
+	os << "Realname    : " << (c.getRealName().empty() ? "(none)" : c.getRealName()) << std::endl;
 	os << "Auth Status : " << c.getAuthStatus() << std::endl;
 	os << "Buffer      : " << c.getBuffer() << std::endl;
 	os << "=============================";
 	return (os);
 }
+
+bool Client::operator!=(const Client &other)
+{
+	if(this->_fd != other._fd)
+		return (true);
+	return (false);
+}
+

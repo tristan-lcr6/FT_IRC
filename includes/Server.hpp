@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/02/27 12:06:28 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/01 19:00:55 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class Server
 	std::string _password;
 	std::vector<Client> _clients;
 	std::vector<struct pollfd> _fds;
-	std::vector<Channel> _channels;
+	std::vector<Channel*> _channels;
 
   public:
 	Server(void);
@@ -73,6 +73,10 @@ class Server
 	void clearClient(int fd);
 
 	Client &findClientByFd(int fd);
+	int findFdByNickName(std::string nickName);
+
+	Channel &getChannel(std::string name); // returns the vector of clients in corresponding channel
+
 	void execute(Client &cli);
 	int findNickName(std::string nickName);
 	bool findChannel(Channel *&channel, const std::string &channel_name);
@@ -85,6 +89,21 @@ class Server
 	void cmdInvite(Client &cli);
 	void cmdTopic(Client &cli);
 	void cmdPrivMsg(Client &cli);
+	void cmdTest(Client &myClient);
+
+
+	class ServerException : public std::exception
+	{
+		private : 
+		 	std::string _mess;
+		public :
+		ServerException(std::string mess) : _mess(mess){}
+		virtual ~ServerException() throw() {}
+        virtual const char* what() const throw() 
+        {
+            return _mess.c_str();
+        }
+	};
 
 };
 

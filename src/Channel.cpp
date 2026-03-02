@@ -4,21 +4,23 @@
 Channel::Channel(void) : _name("#default"), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
 {
 	// std::cout << "Default constructor called" << std::endl;
-	return ;
+	return;
 }
 
 Channel::Channel(Client &cli, std::string name) : _name(name), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
 {
-	this->_operators.push_back(&cli);
-	return ;
+	this->_operators.push_back(&cli);\
+	this->_clients.push_back(&cli);
+	//! need to be add to others vectors
+	return;
 }
 
 // Copy constructor
 Channel::Channel(const Channel &other)
 {
-    // std::cout << "Copy constructor called" << std::endl;
+	// std::cout << "Copy constructor called" << std::endl;
 	this->_name = other._name;
-    this->_topic = other._topic;
+	this->_topic = other._topic;
 	this->_clients = other._clients;
 	this->_i_mode = other._i_mode;
 	this->_invite_list = other._invite_list;
@@ -28,15 +30,15 @@ Channel::Channel(const Channel &other)
 	this->_operators = other._operators;
 	this->_l_mode = other._l_mode;
 	this->_client_limit = other._client_limit;
-	return ;
+	return;
 }
 
 // Assignment operator overload
 Channel &Channel::operator=(const Channel &other)
 {
-    // std::cout << "Assignment operator called" << std::endl;
+	// std::cout << "Assignment operator called" << std::endl;
 	this->_name = other._name;
-    this->_topic = other._topic;
+	this->_topic = other._topic;
 	this->_clients = other._clients;
 	this->_i_mode = other._i_mode;
 	this->_invite_list = other._invite_list;
@@ -53,7 +55,7 @@ Channel &Channel::operator=(const Channel &other)
 Channel::~Channel(void)
 {
 	// std::cout << "Destructor called" << std::endl;
-	return ;
+	return;
 }
 
 bool Channel::isInviteOnly(void) const
@@ -99,7 +101,7 @@ void Channel::setClientLimit(std::string limit_str)
 	if (*end != '\0' || l < 1 )
 	{
 		std::cerr << "Invalid client limit" << std::endl;
-		return ; //! error invalid input
+		return; //! error invalid input
 	}
 	this->setClientLimit(static_cast<size_t>(l));
 }
@@ -111,7 +113,7 @@ void Channel::removeClientLimit()
 
 void Channel::addOperator(Client *cli)
 {
-	this->_operators.push_back(cli);
+	this->_operators.push_back(&cli);
 }
 
 void Channel::addOperator(std::string nick)
@@ -127,7 +129,7 @@ void Channel::removeOperator(Client *cli)
 		if (*this->_operators[i] == *cli)
 		{
 			this->_operators.erase(this->_operators.begin() + i);
-			return ;
+			return;
 		}
 	}
 }
@@ -253,6 +255,8 @@ void Channel::kick(Client &cli)
 	this->removeOperator(&cli);
 }
 
+
+
 void Channel::invite(Client &cli)
 {
 	this->_invite_list.push_back(&cli);
@@ -277,7 +281,7 @@ void Channel::applyMode(char c, bool add)
 	if (modeWithParam(c, add))
 	{
 		std::cerr << "Error: tried to apply mode " << c << " without params" << std::endl;
-		return ; //! error mode needs param
+		return; //! error mode needs param
 	}
 	switch (c)
 	{
@@ -323,29 +327,35 @@ void Channel::applyMode(char c, bool add, std::string param)
 	}
 }
 
+std::ostream &operator<<(std::ostream &os, const Channel &channel)
+{
+	os << "========== CHANNEL DEBUG ==========" << std::endl;
+	os << "Name     : " << channel.getName() << std::endl;
+	os << "Topic    : " << channel.getTopic() << std::endl;
+	os << "Modes    : "
+	   << (channel.isInviteOnly() ? "i" : "")
+	   << (channel.isTopicOpOnly() ? "t" : "")
+	   << (channel.hasKey() ? "k" : "")
+	   << (channel.isLimited() ? "l" : "") << std::endl;
 
-std::ostream &operator<<(std::ostream &os, const Channel &channel) {
-    os << "--- Channel: " << channel.getName() << " ---" << std::endl;
-    os << "Topic: " << (channel.getTopic().empty() ? "(aucun)" : channel.getTopic()) << std::endl;
-    
-    // Affichage des modes actifs
-    os << "Modes: [";
-    if (channel.isInviteOnly()) os << "i";
-    if (channel.isTopicOpOnly()) os << "t";
-    if (channel.hasKey())        os << "k";
-    if (channel.isLimited())     os << "l";
-    os << "]" << std::endl;
+	os << "Clients (Addresses) [" << channel._clients.size() << "]: " << std::endl;
+	for (size_t i = 0; i < channel._clients.size(); ++i)
+	{
+		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickname() << ")" << std::endl;
+	}
 
-    // Détails des limites et clés
-    if (channel.isLimited()) {
-        // Note: Il te faudra peut-être un getter getClientLimit() 
-        // ou accéder à _client_limit si tu mets cette fonction en 'friend'
-        os << "Limit: " << "activée" << std::endl; 
-    }
-    
-    // On peut aussi afficher le nombre de clients présents
-    // os << "Clients connectés: " << channel.getClients().size() << std::endl;
+	os << "Operators (Addresses) [" << channel._operators.size() << "]: " << std::endl;
+	for (size_t i = 0; i < channel._operators.size(); ++i)
+	{
+		os << "  - " << channel._operators[i] << std::endl;
+	}
 
-    os << "---------------------------";
-    return os;
+	os << "Invite List (Addresses) [" << channel._invite_list.size() << "]: " << std::endl;
+	for (size_t i = 0; i < channel._invite_list.size(); ++i)
+	{
+		os << "  - " << channel._invite_list[i] << std::endl;
+	}
+
+	os << "====================================";
+	return os;
 }
