@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/02 16:41:19 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/02 17:08:12 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,11 +103,13 @@ public:
     // Channel.cpp
     // ************************************************************************** //
     void cmdJoin(Client &cli);
+    void JoinMessage(std::string channelName, Client &cli);
     void cmdMode(Client &cli);
     void cmdKick(Client &cli);
     void cmdInvite(Client &cli);
     void cmdTopic(Client &cli);
     void cmdPrivMsg(Client &cli);
+    
     //! --- to RM  ---
     void cmdTest(Client &myClient);
 

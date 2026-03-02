@@ -6,12 +6,10 @@ void Server::setPort(int port)
 	this->_port = port;
 }
 
-
 void Server::setPassword(std::string pswd)
 {
 	this->_password = pswd;
 }
-
 
 Client &Server::findClientByFd(int fd)
 {
@@ -37,9 +35,10 @@ int Server::findFdByNickName(std::string nickName)
 
 Channel &Server::getChannel(std::string Channelname)
 {
+	std::cout << "Channelname " << Channelname << std::endl;
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		std::cout << _channels[i] << std::endl;//!
+		std::cout << _channels[i] << std::endl; //!
 		if (_channels[i]->getName() == Channelname)
 		{
 			return (*_channels[i]);
@@ -47,7 +46,6 @@ Channel &Server::getChannel(std::string Channelname)
 	}
 	throw ServerException("!Error :could not find channel named  : " + Channelname); //! throw exception instead
 }
-
 
 bool Server::isAlreadyChannel(Channel *&channel, const std::string &channel_name)
 {

@@ -60,7 +60,7 @@ std::string Client::setIp(std::string str)
 	return (this->_IP = str);
 }
 
-const std::string &Client::getNickname(void) const
+const std::string &Client::getNickName(void) const
 {
 	return this->_nickName;
 }

@@ -79,7 +79,7 @@ std::ostream &operator<<(std::ostream &os, const Channel &channel)
 	os << "Clients (Addresses) [" << channel._clients.size() << "]: " << std::endl;
 	for (size_t i = 0; i < channel._clients.size(); ++i)
 	{
-		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickname() << ")" << std::endl;
+		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickName() << ")" << std::endl;
 	}
 
 	os << "Operators (Addresses) [" << channel._operators.size() << "]: " << std::endl;

@@ -44,7 +44,7 @@ class Client
 	// Getters
 	// ************************************************************************** //
 
-	const std::string &getNickname(void) const;
+	// const std::string &getNickName(void) const;
 	int getAuthStatus() const;
 	std::string getIp() const;
 	std::string getNickName() const;
@@ -65,7 +65,7 @@ class Client
 	// ************************************************************************** //
 	// Message management
 	// ************************************************************************** //
-	void sendMessageOnClientFd(std::string& msg) const;
+	void sendMessageOnClientFd(std::string msg) const;
 	
 	bool operator!=(const Client &other);
 	bool operator==(const Client &c);
