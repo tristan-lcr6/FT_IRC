@@ -45,6 +45,18 @@ void Server::cmdTest(Client &myClient)
 	myClient.setNickName(passWord);
 }
 
+void Server::broadcastNick(Client &cli, std::string &nick)
+{
+	for (size_t i = 0; i < this->_channels.size(); i++)
+	{
+		if (_channels[i]->getClient(cli.getNickName()) != NULL)
+		{
+			std::string msg = ":" + cli.getPrefix() + " NICK :" + nick + "\n";
+			_channels[i]->sendChannelMessage(cli, msg);
+		}
+	}
+}
+
 void Server::cmdNick(Client &myClient)
 {
 	std::cout << myClient << std::endl;
@@ -57,14 +69,15 @@ void Server::cmdNick(Client &myClient)
 	{
 		if (findFdByNickName(nickname) == -1)
 		{
+			broadcastNick(myClient, nickname);
 			myClient.setNickName(nickname);
 			std::cout << myClient << std::endl;
 		}
 		else
-			std::cout << "Error : Nickame already used." << std::endl;
+			std::cout << "Error: Nickame already used." << std::endl;
 	}
 	else
-		std::cout << "Error :Not a valid Nickame." << std::endl;
+		std::cout << "Error: Not a valid Nickame." << std::endl;
 }
 void Server::cmdUser(Client &myClient)
 {

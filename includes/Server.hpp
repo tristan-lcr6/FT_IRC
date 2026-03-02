@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/02 16:41:19 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/02 17:14:01 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ public:
     // ************************************************************************** //
     void cmdJoin(Client &cli);
     void cmdMode(Client &cli);
+	void broadcastNick(Client &cli, std::string &nick);
     void cmdKick(Client &cli);
     void cmdInvite(Client &cli);
     void cmdTopic(Client &cli);
