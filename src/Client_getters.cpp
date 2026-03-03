@@ -15,7 +15,12 @@ std::string Client::getNickName(void) const
 	return (this->_nickName);
 }
 
-std::string Client::getBuffer(void) const
+const std::string &Client::getBuffer(void) const
+{
+	return (this->_buff);
+}
+
+std::string &Client::getBuffer(void)
 {
 	return (this->_buff);
 }

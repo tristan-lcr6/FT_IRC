@@ -11,16 +11,16 @@ void Server::setPassword(std::string pswd)
 	this->_password = pswd;
 }
 
-Client &Server::findClientByFd(int fd)
+Client *Server::findClientByFd(int fd)
 {
 	std::vector<Client>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); it++)
 	{
 		if (it->getFd() == fd)
-			return (*it);
+			return (&*it);
 	}
 	// throw(std::exception);
-	return (*(_clients.end())); //! change
+	return (NULL);
 }
 
 int Server::findFdByNickName(std::string nickName)

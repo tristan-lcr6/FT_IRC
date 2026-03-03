@@ -49,7 +49,8 @@ class Client
 	std::string getIp() const;
 	std::string getNickName() const;
 	std::string getUserName() const;
-	std::string getBuffer() const;
+	const std::string &getBuffer() const;
+	std::string &getBuffer();
 	std::string getRealName() const;
 	int getFd() const;
 	std::string getPrefix() const;

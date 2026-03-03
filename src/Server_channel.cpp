@@ -22,10 +22,10 @@ void Server::JoinMessage(std::string channelName, Client &cli)
 // JOIN #a,#b,#c passA,passB,passC
 // If the channel exists and can join, joins it
 // If it doesn't exist create it
-void Server::cmdJoin(Client &cli)
+void Server::cmdJoin(Client &cli, std::string cmd)
 {
 	std::string pass;
-	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 2)
 		return;
 	std::vector<std::string> channels = split(tokens[1], ',');
@@ -75,21 +75,28 @@ void Server::cmdJoin(Client &cli)
 // MODE #test +l 10
 // MODE #test -k
 // Verifies that cli is an operator then executes the asked action
-void Server::cmdMode(Client &cli)
+void Server::cmdMode(Client &cli, std::string cmd)
 {
-	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 3)
 	{
 		std::cerr << "Error: not enough arguments for MODE" << std::endl;
 		return; //!
 	}
 	std::string channel_name = tokens[1];
+	if (channel_name[0] != '#')
+		return ; //* ignore user modes
 	std::cout << "Moding " << channel_name << " channel" << std::endl;
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
 		std::cerr << "Error: tried to mode an unknown channel: " << channel_name << std::endl;
 		return; //! Channel doesn't exist
+	}
+	if (channel->getClient(cli.getNickName()) == NULL)
+	{
+		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
+		return; //! Client not in channel
 	}
 	std::string modestring = tokens[2];
 	std::vector<std::string> params;
@@ -127,9 +134,9 @@ void Server::cmdMode(Client &cli)
 
 // KICK <channel> <nick> [:reason]
 // KICK #test john :spamming
-void Server::cmdKick(Client &cli)
+void Server::cmdKick(Client &cli, std::string cmd)
 {
-	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 3)
 	{
 		std::cerr << "Error: not enough arguments for KICK" << std::endl;
@@ -155,6 +162,11 @@ void Server::cmdKick(Client &cli)
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
 		return; //! Channel doesn't exist
 	}
+	if (channel->getClient(cli.getNickName()) == NULL)
+	{
+		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
+		return; //! Client not in channel
+	}
 	channel->kick(*channel->getClient(nick));
 	std::cout << nick << " kicked succesfully" << std::endl;
 }
@@ -174,9 +186,9 @@ void Server::cmdKick(Client &cli)
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
-void Server::cmdInvite(Client &cli)
+void Server::cmdInvite(Client &cli, std::string cmd)
 {
-	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() != 3)
 	{
 		std::cerr << "Error: not enough arguments for INVITE" << std::endl;
@@ -189,6 +201,11 @@ void Server::cmdInvite(Client &cli)
 	{
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
 		return; //! Channel doesn't exist
+	}
+	if (channel->getClient(cli.getNickName()) == NULL)
+	{
+		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
+		return; //! Client not in channel
 	}
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
@@ -205,9 +222,9 @@ void Server::cmdInvite(Client &cli)
 // TOPIC #test -> affiche le topic
 // TOPIC #test :New topic -> change le topic
 // si channel +t alors le changement est op-only
-void Server::cmdTopic(Client &cli)
+void Server::cmdTopic(Client &cli, std::string cmd)
 {
-	std::vector<std::string> tokens = split(cli.getBuffer(), ' ');
+	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 2)
 	{
 		std::cerr << "Error: not enough arguments for TOPIC" << std::endl;
@@ -220,6 +237,11 @@ void Server::cmdTopic(Client &cli)
 	{
 		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
 		return; //! Channel doesn't exist
+	}
+	if (channel->getClient(cli.getNickName()) == NULL)
+	{
+		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
+		return; //! Client not in channel
 	}
 	if (tokens.size() == 2)
 	{
@@ -249,12 +271,12 @@ static std::vector<std::string> GetTokens(std::string cpy, std::string &final)
 	return split(header, " ");
 }
 
-void Server::cmdPrivMsg(Client &myClient)
+void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 {
 
 	std::string message;
 	std::string channelName;
-	std::string bufferCpy = myClient.getBuffer();
+	std::string bufferCpy = cmd;
 	std::vector<std::string> tokens = GetTokens(bufferCpy, message);
 	if (tokens.size() < 2)
 	{
@@ -283,7 +305,7 @@ void Server::cmdPrivMsg(Client &myClient)
 
 			int targetFd = findFdByNickName(target);
 			if (targetFd != -1)
-				findClientByFd(targetFd).sendMessageOnClientFd(formattedMsg);
+				findClientByFd(targetFd)->sendMessageOnClientFd(formattedMsg);
 		}
 		catch (std::exception &e)
 		{

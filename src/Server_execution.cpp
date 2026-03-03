@@ -25,51 +25,66 @@ static int parse(std::string cmd)
 	return (i);
 }
 
-void Server::execute(Client &cli)
+void Server::execute(Client &cli, std::string cmd)
 {
 	int cmdIdx;
-
-	void (Server::*commands[])(Client &) = {&Server::capLs, &Server::cmdPass, &Server::cmdNick,
-											&Server::cmdUser, &Server::cmdJoin, &Server::cmdPrivMsg, &Server::cmdMode, &Server::cmdKick, &Server::cmdInvite, &Server::cmdTopic, &Server::cmdTest};
-
-	cmdIdx = parse(cli.getBuffer());
+	void (Server::*commands[])(Client &, std::string) = {
+		&Server::cmdCap,
+		&Server::cmdPass,
+		&Server::cmdNick,
+		&Server::cmdUser,
+		&Server::cmdJoin,
+		&Server::cmdPrivMsg,
+		&Server::cmdMode,
+		&Server::cmdKick,
+		&Server::cmdInvite,
+		&Server::cmdTopic,
+		&Server::cmdTest
+	};
+	cmdIdx = parse(cmd);
 	if (cmdIdx < 0 || cmdIdx > 10)
 	{
-		std::cerr << "Error: unknown command: " << cli.getBuffer() << std::endl;
+		std::cerr << "Error: unknown command: " << cmd << std::endl;
 		return; //! commande inconnue ou vide, faut voir quoi renvoyer
 	}
 	try
 	{
 		int pre_auth = cli.getAuthStatus();
-		(this->*commands[cmdIdx])(cli);
+
+		// If password is required and not provided yet,
+		// only allow CAP and PASS
+		if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0 // CAP
+			&& cmdIdx != 1) // PASS
+		{
+			std::cerr << "Error: authentication required" << std::endl;
+			return;
+		}
+
+		// If not fully registered, only allow PASS/NICK/USER/CAP
+		if (cli.getAuthStatus() < 2 && cmdIdx > 3)
+		{
+			std::cerr << "Error: client not registered yet" << std::endl;
+			return;
+		}
+
+		// Execute command
+		(this->*commands[cmdIdx])(cli, cmd);
+
 		int post_auth = cli.getAuthStatus();
+
+		// Send welcome numeric when registration completes
 		if (pre_auth < 2 && post_auth == 2)
 		{
-			// :nom_serveur 001 nick :Welcome to the Internet Relay Network nick!user@host
-			std::string msg = ":ft_irc 001 " + cli.getNickName() + " :Welcome to the Internet Relay Network " + cli.getPrefix() + "\n";
+			std::string msg =
+				":ft_irc 001 " + cli.getNickName() +
+				" :Welcome to the Internet Relay Network " +
+				cli.getPrefix() + "\r\n";
+
 			cli.sendMessageOnClientFd(msg);
-		}
-		return;
-		if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
-		{
-			(this->*commands[cmdIdx])(cli);
 		}
 	}
 	catch (std::exception &e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 	}
-	//  if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0)
-    // {
-    //     std::cerr << "Error tried to log without password" << std::endl;
-    //     return; //! frerot faut mettre un mdp
-    // }
-    // else if (cli.getAuthStatus() < 2 && cmdIdx > 2)
-    // {
-    //     std::cerr << "Error tried to cmd without log" << std::endl;
-    //     return; //! frerot log toi
-    // }
-	// else
-	// 	// commands[cmdIdx](cli);
-	// 	return;
 }

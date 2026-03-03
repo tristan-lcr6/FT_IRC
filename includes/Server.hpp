@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/02 17:08:12 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/03 13:31:55 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,9 @@
 #define CYAN "\033[96m"
 #define END "\033[0m"
 
+// erreurs: ":<server> <code> <receiver_nick> <params...> :<message>"
+// std::string msg = ":ft_irc 461 " + myClient.getNickName() + " " + cmd + " :Not enough parameters";
+// myClient.sendMessageOnClientFd(msg);
 class Server
 {
 private:
@@ -78,7 +81,7 @@ public:
     // ************************************************************************** //
     void setPort(int port);
     void setPassword(std::string pswd);
-    Client &findClientByFd(int fd);
+    Client *findClientByFd(int fd);
     int findFdByNickName(std::string nickName);
     Channel &getChannel(std::string name);
     bool isAlreadyChannel(Channel *&channel, const std::string &channel_name);
@@ -87,32 +90,32 @@ public:
     // ************************************************************************** //
     // --- Command Execution (Execution.cpp) ---
     // ************************************************************************** //
-    void execute(Client &cli);
+    void execute(Client &cli, std::string cmd);
 
     
     // ************************************************************************** //
     // --- IRC Commands (Dossier commands/) ---
     // ************************************************************************** //
-    void capLs(Client &cli);
-    void cmdPass(Client &cli);
-    void cmdNick(Client &cli);
-    void cmdUser(Client &cli);
+    void cmdCap(Client &cli, std::string cmd);
+    void cmdPass(Client &cli, std::string cmd);
+    void cmdNick(Client &cli, std::string cmd);
+    void cmdUser(Client &cli, std::string cmd);
 
     
     // ************************************************************************** //
     // Channel.cpp
     // ************************************************************************** //
-    void cmdJoin(Client &cli);
+    void cmdJoin(Client &cli, std::string cmd);
     void JoinMessage(std::string channelName, Client &cli);
-    void cmdMode(Client &cli);
+    void cmdMode(Client &cli, std::string cmd);
 	void broadcastNick(Client &cli, std::string &nick);
-    void cmdKick(Client &cli);
-    void cmdInvite(Client &cli);
-    void cmdTopic(Client &cli);
-    void cmdPrivMsg(Client &cli);
+    void cmdKick(Client &cli, std::string cmd);
+    void cmdInvite(Client &cli, std::string cmd);
+    void cmdTopic(Client &cli, std::string cmd);
+    void cmdPrivMsg(Client &cli, std::string cmd);
     
     //! --- to RM  ---
-    void cmdTest(Client &myClient);
+    void cmdTest(Client &myClient, std::string cmd);
 
     
     // ************************************************************************** //

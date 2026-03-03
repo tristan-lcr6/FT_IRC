@@ -1,11 +1,11 @@
 #include "Client.hpp"
 
-Client::Client() : _authStatus(0)
+Client::Client() : _authStatus(0), _nickName("*")
 {
 	return ;
 }
 
-Client::Client(int fd) : _fd(fd), _authStatus(0)
+Client::Client(int fd) : _fd(fd), _authStatus(0), _nickName("*")
 {
 	// std::cout << "Client constructor called" << std::endl;
 	return ;
