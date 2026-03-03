@@ -9,7 +9,7 @@ void Server::JoinMessage(std::string channelName, Client &cli)
 	std::string serverName = "irc.42.fr";
 	std::string const prefix = cli.getPrefix();
 	cli.sendMessageOnClientFd(prefix + " JOIN " + channelName);
-	cli.sendMessageOnClientFd(prefix + " 332 " + channelName + " :Bienvenue sur " + channelName);
+	cli.sendMessageOnClientFd(prefix + " 332 " + channelName + " :Welcome " + channelName);
 	cli.sendMessageOnClientFd(":" + serverName + " 333 " + nick + " " + channelName + " " + nick + " 1672531200");
 
 	// 4. Envoyer la liste des noms (RPL_NAMsendMessageOnClientFd 353)
@@ -209,7 +209,7 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 	}
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i].getNickName() == nick)
+		if (this->_clients[i]->getNickName() == nick)
 		{
 			channel->invite(this->_clients[i]);
 			std::cout << nick << " invited to " << channel_name << std::endl;

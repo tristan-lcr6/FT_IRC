@@ -20,7 +20,7 @@ static int parse(std::string cmd)
 	std::string commands[11] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
 								"MODE", "KICK", "INVITE", "TOPIC", "1"};
 	i = 0;
-	while (i < 10 && name != commands[i])
+	while (i < 11 && name != commands[i])
 		++i;
 	return (i);
 }

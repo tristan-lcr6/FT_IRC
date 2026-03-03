@@ -45,9 +45,9 @@ void Channel::setTopic(std::string topic)
 	this->_topic = topic;
 }
 
-void Channel::invite(Client &cli)
+void Channel::invite(Client *cli)
 {
-	this->_invite_list.push_back(&cli);
+	this->_invite_list.push_back(cli);
 }
 
 void Channel::setInviteOnly(bool b)

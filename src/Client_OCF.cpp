@@ -30,6 +30,7 @@ Client &Client::operator=(const Client &other)
 		this->_userName = other.getUserName();
 		this->_buff = other.getBuffer();
 		this->_realName = other.getRealName();
+		this->_IP = other.getIp();
 	}
 	return (*this);
 }

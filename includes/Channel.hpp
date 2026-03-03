@@ -65,7 +65,7 @@ public:
 	// ************************************************************************** //
 
 	void setInviteOnly(bool b);	 // sets i_mode to b
-	void invite(Client &cli);	// adds client to the invite list if i_mode is enabled
+	void invite(Client *cli);	// adds client to the invite list if i_mode is enabled
 	void setTopicOpOnly(bool b); // sets t_mode to b
 	void setTopic(std::string topic); // sets the topic
 
