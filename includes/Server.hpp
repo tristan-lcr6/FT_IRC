@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/03 13:31:55 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/03 16:05:54 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ private:
     std::vector<Channel *> _channels;
 
 public:
-
     // ************************************************************************** //
     //  Server Constructor Destructor
     // ************************************************************************** //
@@ -75,7 +74,6 @@ public:
     void clearClient(int fd);
     static void signalHandler(int signum);
 
-    
     // ************************************************************************** //
     // --- Data Management (Server.cpp) ---
     // ************************************************************************** //
@@ -86,13 +84,12 @@ public:
     Channel &getChannel(std::string name);
     bool isAlreadyChannel(Channel *&channel, const std::string &channel_name);
 
-    
     // ************************************************************************** //
     // --- Command Execution (Execution.cpp) ---
     // ************************************************************************** //
     void execute(Client &cli, std::string cmd);
+    void ping(Client &cli, std::string cmd);
 
-    
     // ************************************************************************** //
     // --- IRC Commands (Dossier commands/) ---
     // ************************************************************************** //
@@ -101,23 +98,21 @@ public:
     void cmdNick(Client &cli, std::string cmd);
     void cmdUser(Client &cli, std::string cmd);
 
-    
     // ************************************************************************** //
     // Channel.cpp
     // ************************************************************************** //
     void cmdJoin(Client &cli, std::string cmd);
     void JoinMessage(std::string channelName, Client &cli);
     void cmdMode(Client &cli, std::string cmd);
-	void broadcastNick(Client &cli, std::string &nick);
+    void broadcastNick(Client &cli, std::string &nick);
     void cmdKick(Client &cli, std::string cmd);
     void cmdInvite(Client &cli, std::string cmd);
     void cmdTopic(Client &cli, std::string cmd);
     void cmdPrivMsg(Client &cli, std::string cmd);
-    
+
     //! --- to RM  ---
     void cmdTest(Client &myClient, std::string cmd);
 
-    
     // ************************************************************************** //
     // --- Exceptions ---
     // ************************************************************************** //
@@ -132,7 +127,6 @@ public:
         virtual const char *what() const throw() { return _mess.c_str(); }
     };
 };
-
 
 // ************************************************************************** /
 // --- Global Utils (utils.cpp) ---

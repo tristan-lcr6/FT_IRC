@@ -12,7 +12,9 @@ std::string Client::getIp(void) const
 
 std::string Client::getNickName(void) const
 {
-	return (this->_nickName);
+	if (!this->_nickName.empty())
+		return (this->_nickName);
+	return (NULL);
 }
 
 const std::string &Client::getBuffer(void) const
@@ -42,5 +44,8 @@ std::string Client::getRealName() const
 
 std::string Client::getPrefix() const
 {
-    return this->_nickName + "!" + this->_userName + "@" + this->_IP;
+	std::string nickName = this->_nickName.empty() ? "Unnkown" : this->_nickName;
+	std::string userName = this->_userName.empty() ? "Unnkown" : this->_userName;
+	std::string IpAdd = this->_IP.empty() ? "Unnkown" : this->_IP;
+    return nickName + "!" + userName + "@" + IpAdd;
 }

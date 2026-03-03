@@ -71,7 +71,7 @@ void Server::broadcastNick(Client &cli, std::string &nick)
 
 void Server::cmdNick(Client &myClient, std::string cmd)
 {
-	std::cout << myClient << std::endl;
+	// std::cout << myClient << std::endl;
 	std::string nickname;
 	std::size_t nameStart = cmd.find_first_of(' ');
 	if (nameStart == cmd.size() || nameStart == std::string::npos)

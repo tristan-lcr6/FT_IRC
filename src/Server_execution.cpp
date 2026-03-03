@@ -17,10 +17,10 @@ static int parse(std::string cmd)
 		name = cmd.substr(0, name_end);
 	else
 		name = cmd;
-	std::string commands[11] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
-								"MODE", "KICK", "INVITE", "TOPIC", "1"};
+	std::string commands[12] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
+								"MODE", "KICK", "INVITE", "TOPIC", "1", "PING"};
 	i = 0;
-	while (i < 10 && name != commands[i])
+	while (i < 11 && name != commands[i])
 		++i;
 	return (i);
 }
@@ -39,10 +39,12 @@ void Server::execute(Client &cli, std::string cmd)
 		&Server::cmdKick,
 		&Server::cmdInvite,
 		&Server::cmdTopic,
-		&Server::cmdTest
+		&Server::cmdTest,
+		&Server::ping
+
 	};
 	cmdIdx = parse(cmd);
-	if (cmdIdx < 0 || cmdIdx > 10)
+	if (cmdIdx < 0 || cmdIdx > 11)
 	{
 		std::cerr << "Error: unknown command: " << cmd << std::endl;
 		return; //! commande inconnue ou vide, faut voir quoi renvoyer
@@ -54,7 +56,7 @@ void Server::execute(Client &cli, std::string cmd)
 		// If password is required and not provided yet,
 		// only allow CAP and PASS
 		if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0 // CAP
-			&& cmdIdx != 1) // PASS
+			&& cmdIdx != 1)														// PASS
 		{
 			std::cerr << "Error: authentication required" << std::endl;
 			return;
@@ -86,5 +88,21 @@ void Server::execute(Client &cli, std::string cmd)
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
+	}
+}
+
+void Server::ping(Client &cli, std::string cmd)
+{
+	std::vector<std::string> tokens = split(cmd, " ");
+	if (tokens[0] == "PING")
+	{
+		if (tokens.size() < 2)
+		{
+			// Erreur : pas assez de paramètres (461)
+			return;
+		}
+		std::string param = tokens[1];
+		std::string response = ":our_ft_irc.fr PONG :" + param + "\r\n";
+		send(cli.getFd(), response.c_str(), response.length(), 0);
 	}
 }
