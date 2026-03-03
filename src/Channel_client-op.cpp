@@ -44,12 +44,14 @@ void Channel::join(Client &cli)
 {
 	if (this->_k_mode)
 	{
-		std::cerr << "Error: tried to join " << this->_name << " without password" << std::endl;
+		std::string msg = ":ft_irc 475 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+k)";
+		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur besoin de password
 	}
 	if (this->_l_mode && this->_clients.size() >= this->_client_limit)
 	{
-		std::cerr << "Error: can't join, " << this->_name << " is full" << std::endl;
+		std::string msg = ":ft_irc 471 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+l)";
+		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur peut pas rejoindre
 	}
 	if (this->_i_mode)
@@ -62,7 +64,8 @@ void Channel::join(Client &cli)
 				return ;
 			}
 		}
-		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickName() << ") are not invited" << std::endl;
+		std::string msg = ":ft_irc 473 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+i)";
+		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur n'est pas invite
 	}
 	this->_clients.push_back(&cli);
@@ -72,12 +75,14 @@ void Channel::join(Client &cli, std::string pwd)
 {
 	if (this->_k_mode && this->_password != pwd)
 	{
-		std::cerr << "Error: tried to join " << this->_name << " with wrong password" << std::endl;
+		std::string msg = ":ft_irc 475 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+k)";
+		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur mauvais password
 	}
 	if (this->_l_mode && this->_clients.size() >= this->_client_limit)
 	{
-		std::cerr << "Error: can't join, " << this->_name << " is full" << std::endl;
+		std::string msg = ":ft_irc 471 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+l)";
+		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur peut pas rejoindre
 	}
 	if (this->_i_mode)
@@ -90,7 +95,8 @@ void Channel::join(Client &cli, std::string pwd)
 				return ;
 			}
 		}
-		std::cerr << "Error: Can't join " << this->_name << " because you (" << cli.getNickName() << ") are not invited" << std::endl;
+		std::string msg = ":ft_irc 473 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+i)";
+		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur n'est pas invite
 	}
 	this->_clients.push_back(&cli);

@@ -24,10 +24,13 @@ void Server::JoinMessage(std::string channelName, Client &cli)
 // If it doesn't exist create it
 void Server::cmdJoin(Client &cli, std::string cmd)
 {
-	std::string pass;
 	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 2)
-		return;
+	{
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " JOIN :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
+		return ;
+	}
 	std::vector<std::string> channels = split(tokens[1], ',');
 	std::vector<std::string> passwords;
 	if (tokens.size() > 2)
@@ -37,21 +40,21 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 
 		std::string name = channels[i];
 		if (name[0] != '#')
-			throw ServerException("Cannot find '#' to start channel name.");
+		{
+			std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + name + " :No such channel";
+			cli.sendMessageOnClientFd(msg);
+		}
 		bool found = false;
 		for (std::size_t j = 0; j < this->_channels.size(); j++)
 		{
-
 			if (name == this->_channels[j]->getName())
 			{
 				if (i < passwords.size())
-					pass = passwords[i];
+					this->_channels[j]->join(cli, passwords[i]);
 				else
-					pass = ""; //! change password handling ?
-				this->_channels[j]->join(cli, pass);
+					this->_channels[j]->join(cli);
 				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
 				JoinMessage(name, cli);
-
 				found = true;
 				break;
 			}
@@ -63,7 +66,6 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 			// std::cout << "Channel " << name << " created and client added." << std::endl;
 			std::cout << *newChan << std::endl;
 			JoinMessage(name, cli);
-
 		}
 	}
 }
@@ -80,29 +82,30 @@ void Server::cmdMode(Client &cli, std::string cmd)
 	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 3)
 	{
-		std::cerr << "Error: not enough arguments for MODE" << std::endl;
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " MODE :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
 		return; //!
 	}
 	std::string channel_name = tokens[1];
 	if (channel_name[0] != '#')
 		return ; //* ignore user modes
-	std::cout << "Moding " << channel_name << " channel" << std::endl;
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
-		std::cerr << "Error: tried to mode an unknown channel: " << channel_name << std::endl;
+		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
-	if (channel->getClient(cli.getNickName()) == NULL)
+	if (channel->getClient(cli.getNickName()) == NULL || !channel->isOperator(cli.getNickName()))
 	{
-		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
-		return; //! Client not in channel
+		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Client not in channel or not operator
 	}
 	std::string modestring = tokens[2];
 	std::vector<std::string> params;
 	if (tokens.size() > 3)
 		params.assign(tokens.begin() + 3, tokens.end());
-	;
 	std::size_t paramIdx = 0;
 	bool add = true;
 	for (size_t i = 0; i < modestring.size(); ++i)
@@ -122,8 +125,9 @@ void Server::cmdMode(Client &cli, std::string cmd)
 		{
 			if (paramIdx >= params.size())
 			{
-				std::cerr << "Error: the mode " << c << " needs params" << std::endl;
-				return; //! error not enough params
+				std::string msg = ":ft_irc 461 " + cli.getNickName() + " MODE :Not enough parameters";
+				cli.sendMessageOnClientFd(msg);
+				continue; //! error not enough params
 			}
 			channel->applyMode(c, add, params[paramIdx++]);
 		}
@@ -139,7 +143,8 @@ void Server::cmdKick(Client &cli, std::string cmd)
 	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 3)
 	{
-		std::cerr << "Error: not enough arguments for KICK" << std::endl;
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " KICK :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
 		return; //!
 	}
 	std::string channel_name = tokens[1];
@@ -149,23 +154,32 @@ void Server::cmdKick(Client &cli, std::string cmd)
 	{
 		if (tokens[3][0] != ':')
 		{
-			std::cerr << "Error: bad arguments for KICK, missing : before reason" << std::endl;
+			std::string msg = ":ft_irc 461 " + cli.getNickName() + " KICK :Not enough parameters";
+			cli.sendMessageOnClientFd(msg);
 			return; //!
 		}
-		reason = tokens[3].substr(1, tokens[3].size());
+		reason = tokens[3].substr(1);
 		for (size_t i = 4; i < tokens.size(); i++)
 			reason += tokens[i];
 	}
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
-		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
+		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
-	if (channel->getClient(cli.getNickName()) == NULL)
+	if (channel->getClient(cli.getNickName()) == NULL || !channel->isOperator(cli.getNickName()))
 	{
-		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
-		return; //! Client not in channel
+		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Client not in channel or not operator
+	}
+	if (channel->getClient(nick) == NULL)
+	{
+		std::string msg = ":ft_irc 441 " + cli.getNickName() + " " + nick + " " + channel_name + " :They aren't on that channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! nickname not in channel
 	}
 	channel->kick(*channel->getClient(nick));
 	std::cout << nick << " kicked succesfully" << std::endl;
@@ -186,12 +200,15 @@ void Server::cmdKick(Client &cli, std::string cmd)
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
+// envoyer :ft_irc 341 <inviter> <target> <channel> a l'inviteur
+// envoyer :nick INVITE target :#channel a l'invite
 void Server::cmdInvite(Client &cli, std::string cmd)
 {
 	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() != 3)
 	{
-		std::cerr << "Error: not enough arguments for INVITE" << std::endl;
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " INVITE :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
 		return; //!
 	}
 	std::string nick = tokens[1];
@@ -199,22 +216,40 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
-		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
+		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
-	if (channel->getClient(cli.getNickName()) == NULL)
+	if (channel->getClient(cli.getNickName()) == NULL || !channel->isOperator(cli.getNickName()))
 	{
-		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
-		return; //! Client not in channel
+		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Client not in channel or not operator
 	}
+	if (channel->getClient(nick) != NULL)
+	{
+		std::string msg = ":ft_irc 443 " + cli.getNickName() + " " + nick + " " + channel_name + " :is already on channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! target already in channel
+	}
+	bool found = false;
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
 		if (this->_clients[i].getNickName() == nick)
 		{
 			channel->invite(this->_clients[i]);
-			std::cout << nick << " invited to " << channel_name << std::endl;
+			std::string inviterMsg = ":ft_irc 341 " + cli.getNickName() + " " + nick + " " + channel_name;
+			std::string invitedMsg = ":" + cli.getNickName() + " INVITE " + nick + " :" + channel_name;
+			cli.sendMessageOnClientFd(inviterMsg);
+			this->_clients[i].sendMessageOnClientFd(invitedMsg);
+			found = true;
 			break;
 		}
+	}
+	if (!found)
+	{
+		std::string msg = ":ft_irc 401 " + cli.getNickName() + " " + nick + " :No such nick";
+		cli.sendMessageOnClientFd(msg);
 	}
 }
 
@@ -222,12 +257,14 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 // TOPIC #test -> affiche le topic
 // TOPIC #test :New topic -> change le topic
 // si channel +t alors le changement est op-only
+// envoyer :<nick>!<user>@<host> TOPIC <channel> :<new topic> sur le channel
 void Server::cmdTopic(Client &cli, std::string cmd)
 {
 	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 2)
 	{
-		std::cerr << "Error: not enough arguments for TOPIC" << std::endl;
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " TOPIC :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
 		return; //!
 	}
 	std::string channel_name = tokens[1];
@@ -235,81 +272,104 @@ void Server::cmdTopic(Client &cli, std::string cmd)
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(channel, channel_name))
 	{
-		std::cerr << "Error: tried to kick in an unknown channel: " << channel_name << std::endl;
+		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
 	if (channel->getClient(cli.getNickName()) == NULL)
 	{
-		std::cerr << "Error: " << cli.getNickName() << " is not part of " << channel_name << std::endl;
+		std::string msg = ":ft_irc 442 " + cli.getNickName() + " " + channel_name + " :You're not on that channel";
+		cli.sendMessageOnClientFd(msg);
 		return; //! Client not in channel
 	}
 	if (tokens.size() == 2)
 	{
 		topic = channel->getTopic();
-		std::cout << "Topic is: " << topic << std::endl; //! a envoyer au client
+		if (topic.empty())
+		{
+			std::string msg = ":ft_irc 331 " + cli.getNickName() + " " + channel_name + " :No topic is set";
+			cli.sendMessageOnClientFd(msg);
+		}
+		else
+		{
+			std::string msg = ":ft_irc 332 " + cli.getNickName() + " " + channel_name + " :" + topic;
+			cli.sendMessageOnClientFd(msg);
+		}
 		return;
 	}
 	if (tokens[2][0] != ':')
 	{
-		std::cerr << "Error: bad arguments for TOPIC, missing : before topic" << std::endl;
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " TOPIC :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
 		return; //!
 	}
-	topic = tokens[2].substr(1, tokens[2].size());
+	if (channel->isTopicOpOnly() && !channel->isOperator(cli.getNickName()))
+	{
+		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Client not operator
+	}
+	topic = tokens[2].substr(1);
 	for (size_t i = 3; i < tokens.size(); i++)
 		topic += tokens[i];
 	channel->setTopic(topic);
-	std::cout << "Topic set to: " << topic << std::endl;
+	std::string msg = ":" + cli.getPrefix() + " TOPIC " + channel_name + " :" + topic;
+	channel->sendChannelMessage(cli, msg);
+	cli.sendMessageOnClientFd(msg);
 }
 
-static std::vector<std::string> GetTokens(std::string cpy, std::string &final)
-{
-	size_t colonPos = cpy.find(":");
-	if (colonPos == std::string::npos)
-		return split(cpy, " ");
-	final = cpy.substr(colonPos + 1);
-	std::string header = cpy.substr(0, colonPos);
-	return split(header, " ");
-}
+// static std::vector<std::string> GetTokens(std::string cpy, std::string &final)
+// {
+// 	size_t colonPos = cpy.find(":");
+// 	if (colonPos == std::string::npos)
+// 		return split(cpy, " ");
+// 	final = cpy.substr(colonPos + 1);
+// 	std::string header = cpy.substr(0, colonPos);
+// 	return split(header, " ");
+// }
 
 void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 {
 
-	std::string message;
-	std::string channelName;
 	std::string bufferCpy = cmd;
-	std::vector<std::string> tokens = GetTokens(bufferCpy, message);
+	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 2)
 	{
-		std::cout << "Error: No target specified" << std::endl;
+		std::string msg = ":ft_irc 411 " + myClient.getNickName() + " :No recipient given (" + cmd + ")";
+		myClient.sendMessageOnClientFd(msg);
 		return;
 	}
+	if (tokens.size() < 3 || tokens[2][0] != ':' || tokens[2].size() == 1)
+	{
+		std::string msg = ":ft_irc 412 " + myClient.getNickName() + " :No text to send";
+		myClient.sendMessageOnClientFd(msg);
+		return;
+	}
+	std::string message = tokens[2].substr(1);
 	std::string target = tokens[1];
-	std::string formattedMsg = ":" + myClient.getNickName() + " PRIVMSG " + target + " :" + message;
+	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
 	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
 	if (target[0] == '#')
 	{
-		channelName = target;
 		try
 		{
-			getChannel(channelName).sendChannelMessage(myClient, formattedMsg);
+			getChannel(target).sendChannelMessage(myClient, formattedMsg);
 		}
 		catch (std::exception &e)
 		{
-			std::cout << e.what() << std::endl;
+			std::string msg = ":ft_irc 401 " + myClient.getNickName() + " " + target + " :No such channel";
+			myClient.sendMessageOnClientFd(msg);
 		}
 	}
 	else
 	{
-		try
+		int targetFd = findFdByNickName(target);
+		if (targetFd != -1)
+			findClientByFd(targetFd)->sendMessageOnClientFd(formattedMsg);
+		else
 		{
-
-			int targetFd = findFdByNickName(target);
-			if (targetFd != -1)
-				findClientByFd(targetFd)->sendMessageOnClientFd(formattedMsg);
-		}
-		catch (std::exception &e)
-		{
-			std::cout << e.what() << std::endl;
+			std::string msg = ":ft_irc 401 " + myClient.getNickName() + " " + target + " :No such nick";
+			myClient.sendMessageOnClientFd(msg);
 		}
 	}
 }
