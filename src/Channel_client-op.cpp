@@ -68,6 +68,7 @@ void Channel::join(Client &cli)
 		cli.sendMessageOnClientFd(msg);
 		return ; //! erreur n'est pas invite
 	}
+	std::cout << "Adresse postjoin: " << &cli << std::endl;
 	this->_clients.push_back(&cli);
 }
 

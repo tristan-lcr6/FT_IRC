@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/03 16:05:54 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/03 19:16:11 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ public:
     Client *findClientByFd(int fd);
     int findFdByNickName(std::string nickName);
     Channel &getChannel(std::string name);
-    bool isAlreadyChannel(Channel *&channel, const std::string &channel_name);
+    bool isAlreadyChannel(Channel **channel, const std::string &channel_name);
 
     // ************************************************************************** //
     // --- Command Execution (Execution.cpp) ---

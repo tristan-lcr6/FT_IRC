@@ -35,10 +35,10 @@ int Server::findFdByNickName(std::string nickName)
 
 Channel &Server::getChannel(std::string Channelname)
 {
-	std::cout << "Channelname " << Channelname << std::endl;
+	// std::cout << "Channelname " << Channelname << std::endl;
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		std::cout << _channels[i] << std::endl; //!
+		// std::cout << _channels[i] << std::endl; //!
 		if (_channels[i]->getName() == Channelname)
 		{
 			return (*_channels[i]);
@@ -47,13 +47,13 @@ Channel &Server::getChannel(std::string Channelname)
 	throw ServerException("!Error :could not find channel named  : " + Channelname); //! throw exception instead
 }
 
-bool Server::isAlreadyChannel(Channel *&channel, const std::string &channel_name)
+bool Server::isAlreadyChannel(Channel **channel, const std::string &channel_name)
 {
 	for (std::size_t i = 0; i < this->_channels.size(); i++)
 	{
 		if (channel_name == this->_channels[i]->getName())
 		{
-			channel = this->_channels[i];
+			*channel = this->_channels[i];
 			return true;
 		}
 	}

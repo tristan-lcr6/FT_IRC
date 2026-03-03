@@ -12,9 +12,7 @@ std::string Client::getIp(void) const
 
 std::string Client::getNickName(void) const
 {
-	if (!this->_nickName.empty())
-		return (this->_nickName);
-	return (NULL);
+	return (this->_nickName);
 }
 
 const std::string &Client::getBuffer(void) const

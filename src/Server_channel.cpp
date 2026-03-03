@@ -49,11 +49,12 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 		{
 			if (name == this->_channels[j]->getName())
 			{
+				std::cout << "Adresse prejoin: " << &cli << std::endl;
 				if (i < passwords.size())
 					this->_channels[j]->join(cli, passwords[i]);
 				else
 					this->_channels[j]->join(cli);
-				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
+				// std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
 				JoinMessage(name, cli);
 				found = true;
 				break;
@@ -61,6 +62,7 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 		}
 		if (!found)
 		{
+			std::cout << "Adresse prejoin: " << &cli << std::endl;
 			Channel *newChan = new Channel(cli, name);
 			this->_channels.push_back(newChan);
 			// std::cout << "Channel " << name << " created and client added." << std::endl;
@@ -90,7 +92,7 @@ void Server::cmdMode(Client &cli, std::string cmd)
 	if (channel_name[0] != '#')
 		return ; //* ignore user modes
 	Channel *channel = NULL;
-	if (!this->isAlreadyChannel(channel, channel_name))
+	if (!this->isAlreadyChannel(&channel, channel_name))
 	{
 		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
 		cli.sendMessageOnClientFd(msg);
@@ -163,12 +165,13 @@ void Server::cmdKick(Client &cli, std::string cmd)
 			reason += tokens[i];
 	}
 	Channel *channel = NULL;
-	if (!this->isAlreadyChannel(channel, channel_name))
+	if (!this->isAlreadyChannel(&channel, channel_name))
 	{
 		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
 		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
+	// std::cout << channel << " channel contain :  -------------------\n" <<  *channel << std::endl;
 	if (channel->getClient(cli.getNickName()) == NULL || !channel->isOperator(cli.getNickName()))
 	{
 		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
@@ -214,7 +217,7 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 	std::string nick = tokens[1];
 	std::string channel_name = tokens[2];
 	Channel *channel = NULL;
-	if (!this->isAlreadyChannel(channel, channel_name))
+	if (!this->isAlreadyChannel(&channel, channel_name))
 	{
 		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
 		cli.sendMessageOnClientFd(msg);
@@ -270,7 +273,7 @@ void Server::cmdTopic(Client &cli, std::string cmd)
 	std::string channel_name = tokens[1];
 	std::string topic;
 	Channel *channel = NULL;
-	if (!this->isAlreadyChannel(channel, channel_name))
+	if (!this->isAlreadyChannel(&channel, channel_name))
 	{
 		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channel_name + " :No such channel";
 		cli.sendMessageOnClientFd(msg);
@@ -346,11 +349,19 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 		return;
 	}
 	std::string message = tokens[2].substr(1);
+	for (size_t i = 3; i < tokens.size(); i++)
+		message += tokens[i];
 	std::string target = tokens[1];
 	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
 	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
 	if (target[0] == '#')
 	{
+		if (getChannel(target).getClient(myClient.getNickName()) == NULL)
+		{
+			std::string msg = ":ft_irc 442 " + myClient.getNickName() + " " + target + " :You're not on that channel";
+			myClient.sendMessageOnClientFd(msg);
+			return; //! Client not in channel
+		}
 		try
 		{
 			getChannel(target).sendChannelMessage(myClient, formattedMsg);

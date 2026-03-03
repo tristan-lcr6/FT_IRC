@@ -34,7 +34,7 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 			return ;
 		}
 		myClient.setGrade(1);
-		std::cout << myClient << std::endl;
+		// std::cout << myClient << std::endl;
 	}
 	else
 	{
@@ -59,14 +59,27 @@ void Server::cmdTest(Client &myClient, std::string cmd)
 
 void Server::broadcastNick(Client &cli, std::string &nick)
 {
-	for (size_t i = 0; i < this->_channels.size(); i++)
+
+	// for (size_t i = 0; i < this->_channels.size(); i++)
+	// {
+	// 	std::cout << "addresse cli use in broadacat " << &cli << std::endl;
+	// 	if (_channels[i]->getClient(cli.getNickName()) != NULL)
+	// 	{
+	// 		std::string msg = ":" + cli.getPrefix() + " NICK :" + nick + "\n";
+	// 		_channels[i]->sendChannelMessage(cli, msg);
+	// 	}
+	// }
+	if(this->_channels.size() == 1)
 	{
-		if (_channels[i]->getClient(cli.getNickName()) != NULL)
+		// std::cout << "addresse cli use in broadacat " << &cli << std::endl;
+		std::cout << *_channels[0] << "\n" << std::endl;
+		if (_channels[0]->getClient(cli.getNickName()) != NULL)
 		{
 			std::string msg = ":" + cli.getPrefix() + " NICK :" + nick + "\n";
-			_channels[i]->sendChannelMessage(cli, msg);
+			_channels[0]->sendChannelMessage(cli, msg);
 		}
 	}
+	
 }
 
 void Server::cmdNick(Client &myClient, std::string cmd)
@@ -89,7 +102,6 @@ void Server::cmdNick(Client &myClient, std::string cmd)
 			myClient.setNickName(nickname);
 			if (!(myClient.getUserName()).empty())
 				myClient.setGrade(2);
-			std::cout << myClient << std::endl;
 		}
 		else
 		{
@@ -123,6 +135,6 @@ void Server::cmdUser(Client &myClient, std::string cmd)
 	myClient.setRealName(tokens[4].substr(1));
 	if (!(myClient.getNickName()).empty() && myClient.getNickName() != "*")
 		myClient.setGrade(2);
-	std::cout << myClient << std::endl;
+	// std::cout << myClient << std::endl;
 
 }
