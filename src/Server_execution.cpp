@@ -46,8 +46,9 @@ void Server::execute(Client &cli, std::string cmd)
 	cmdIdx = parse(cmd);
 	if (cmdIdx < 0 || cmdIdx > 11)
 	{
-		std::cerr << "Error: unknown command: " << cmd << std::endl;
-		return; //! commande inconnue ou vide, faut voir quoi renvoyer
+		std::string msg = ":ft_irc 421 " + cli.getNickName() + " " + cmd + " :Unknown command";
+		cli.sendMessageOnClientFd(msg);
+		return; //! commande inconnue
 	}
 	try
 	{

@@ -18,7 +18,7 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 	std::size_t nameStart = cmd.find_first_of(' ');
 	if (nameStart == cmd.size() || nameStart == std::string::npos)
 	{
-		std::string msg = ":ft_irc 461 " + myClient.getNickName() + " " + cmd + " :Not enough parameters";
+		std::string msg = ":ft_irc 461 " + myClient.getNickName() + " PASS :Not enough parameters";
 		myClient.sendMessageOnClientFd(msg);
 		return ;
 	}
@@ -87,6 +87,8 @@ void Server::cmdNick(Client &myClient, std::string cmd)
 		{
 			broadcastNick(myClient, nickname);
 			myClient.setNickName(nickname);
+			if (!(myClient.getUserName()).empty())
+				myClient.setGrade(2);
 			std::cout << myClient << std::endl;
 		}
 		else
@@ -107,7 +109,7 @@ void Server::cmdUser(Client &myClient, std::string cmd)
 	std::vector<std::string> tokens = split(cmd, ' ');
 	if (tokens.size() < 5)
 	{
-		std::string msg = ":ft_irc 461 " + myClient.getNickName() + " " + cmd + " :Not enough parameters";
+		std::string msg = ":ft_irc 461 " + myClient.getNickName() + " USER :Not enough parameters";
 		myClient.sendMessageOnClientFd(msg);
 		return;
 	}
@@ -119,8 +121,8 @@ void Server::cmdUser(Client &myClient, std::string cmd)
 	}
 	myClient.setUserName(tokens[1]);
 	myClient.setRealName(tokens[4].substr(1));
-	std::cout << myClient.getUserName() << " is now grade 2." << std::endl;
-	myClient.setGrade(2);
+	if (!(myClient.getNickName()).empty() && myClient.getNickName() != "*")
+		myClient.setGrade(2);
 	std::cout << myClient << std::endl;
 
 }

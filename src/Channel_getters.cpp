@@ -29,3 +29,13 @@ const std::string &Channel::getName(void) const
 {
 	return this->_name;
 }
+
+bool Channel::isOperator(std::string nick)
+{
+	for (std::size_t i = 0; i < this->_operators.size(); i++)
+	{
+		if (this->_operators[i]->getNickName() == nick)
+			return (true);
+	}
+	return (false);
+}

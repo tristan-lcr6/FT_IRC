@@ -41,6 +41,7 @@ public:
 	bool isLimited(void) const;		// returns l_mode
 	const std::string &getName(void) const;	 // returns name
 	const std::string &getTopic(void) const; // returns topic
+	bool isOperator(std::string nick);
 
 	// ************************************************************************** //
 	// Client management
