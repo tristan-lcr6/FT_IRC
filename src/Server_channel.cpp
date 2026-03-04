@@ -160,9 +160,9 @@ void Server::cmdKick(Client &cli, std::string cmd)
 			cli.sendMessageOnClientFd(msg);
 			return; //!
 		}
-		reason = tokens[3].substr(1);
+		reason = tokens[3];
 		for (size_t i = 4; i < tokens.size(); i++)
-			reason += tokens[i];
+			reason += " " + tokens[i];
 	}
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(&channel, channel_name))
@@ -184,6 +184,11 @@ void Server::cmdKick(Client &cli, std::string cmd)
 		cli.sendMessageOnClientFd(msg);
 		return; //! nickname not in channel
 	}
+	std::string msg = ":" + cli.getPrefix() + " KICK " + channel_name + " " + nick;
+	if (!reason.empty())
+		msg += " " + reason;
+	cli.sendMessageOnClientFd(msg);
+	channel->sendChannelMessage(cli, msg);
 	channel->kick(*channel->getClient(nick));
 	std::cout << nick << " kicked succesfully" << std::endl;
 }
@@ -314,7 +319,7 @@ void Server::cmdTopic(Client &cli, std::string cmd)
 	}
 	topic = tokens[2].substr(1);
 	for (size_t i = 3; i < tokens.size(); i++)
-		topic += tokens[i];
+		topic += " " + tokens[i];
 	channel->setTopic(topic);
 	std::string msg = ":" + cli.getPrefix() + " TOPIC " + channel_name + " :" + topic;
 	channel->sendChannelMessage(cli, msg);
@@ -350,7 +355,7 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 	}
 	std::string message = tokens[2].substr(1);
 	for (size_t i = 3; i < tokens.size(); i++)
-		message += tokens[i];
+		message += " " + tokens[i];
 	std::string target = tokens[1];
 	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
 	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
