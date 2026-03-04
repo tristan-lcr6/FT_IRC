@@ -169,7 +169,7 @@ void Server::signalHandler(int signum)
 
 void Server::Clean(Client *cli)
 {
-	if ((*cli).getToClean() == 1)
+	if (cli->getToClean() == 1)
 	{
 		std::cout << RED << "Client <" << cli->getFd() << "> Disconnected" << END << std::endl;
 		for (size_t i = 0; i < _channels.size(); i++)
