@@ -40,16 +40,19 @@ public:
 	bool isLimited(void) const;				 // returns l_mode
 	const std::string &getName(void) const;	 // returns name
 	const std::string &getTopic(void) const; // returns topic
+	const std::string &getKey(void) const; // returns password
+	std::string getClientList(void) const; // returns password
+	size_t getLimit(void); // returns client limit
 	size_t getClientsSize(void); // returns ClientsVector
-	bool isOperator(std::string nick);
+	bool isOperator(std::string nick) const;
 
 	// ************************************************************************** //
 	// Client management
 	// ************************************************************************** //
 
 	Client *getClient(std::string nick);	 // returns the client corresponding to the nickname
-	void join(Client &cli);					 // checks if the client can join and adds it to the clients list
-	void join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
+	bool join(Client &cli);					 // checks if the client can join and adds it to the clients list
+	bool join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
 	void kick(Client &cli);
 	void clearClientInChannel(Client *myClient);
 	void clearEmptyChannel(void);

@@ -40,19 +40,19 @@ Client *Channel::getClient(std::string nick)
 	return (NULL); //! Error client not found j'arrive pas a renvoyer NULL
 }
 
-void Channel::join(Client &cli)
+bool Channel::join(Client &cli)
 {
 	if (this->_k_mode)
 	{
 		std::string msg = ":ft_irc 475 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+k)";
 		cli.sendMessageOnClientFd(msg);
-		return ; //! erreur besoin de password
+		return false; //! erreur besoin de password
 	}
 	if (this->_l_mode && this->_clients.size() >= this->_client_limit)
 	{
 		std::string msg = ":ft_irc 471 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+l)";
 		cli.sendMessageOnClientFd(msg);
-		return ; //! erreur peut pas rejoindre
+		return false; //! erreur peut pas rejoindre
 	}
 	if (this->_i_mode)
 	{
@@ -61,30 +61,31 @@ void Channel::join(Client &cli)
 			if (*this->_invite_list[i] == cli)
 			{
 				this->_clients.push_back(&cli);
-				return ;
+				return true;
 			}
 		}
 		std::string msg = ":ft_irc 473 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+i)";
 		cli.sendMessageOnClientFd(msg);
-		return ; //! erreur n'est pas invite
+		return false; //! erreur n'est pas invite
 	}
 	std::cout << "Adresse postjoin: " << &cli << std::endl;
 	this->_clients.push_back(&cli);
+	return true;
 }
 
-void Channel::join(Client &cli, std::string pwd)
+bool Channel::join(Client &cli, std::string pwd)
 {
 	if (this->_k_mode && this->_password != pwd)
 	{
 		std::string msg = ":ft_irc 475 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+k)";
 		cli.sendMessageOnClientFd(msg);
-		return ; //! erreur mauvais password
+		return false; //! erreur mauvais password
 	}
 	if (this->_l_mode && this->_clients.size() >= this->_client_limit)
 	{
 		std::string msg = ":ft_irc 471 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+l)";
 		cli.sendMessageOnClientFd(msg);
-		return ; //! erreur peut pas rejoindre
+		return false; //! erreur peut pas rejoindre
 	}
 	if (this->_i_mode)
 	{
@@ -93,14 +94,15 @@ void Channel::join(Client &cli, std::string pwd)
 			if (*this->_invite_list[i] == cli)
 			{
 				this->_clients.push_back(&cli);
-				return ;
+				return true;
 			}
 		}
 		std::string msg = ":ft_irc 473 " + cli.getNickName() + " " + this->_name + " :Cannot join channel (+i)";
 		cli.sendMessageOnClientFd(msg);
-		return ; //! erreur n'est pas invite
+		return false; //! erreur n'est pas invite
 	}
 	this->_clients.push_back(&cli);
+	return true;
 }
 
 void Channel::kick(Client &cli)
@@ -151,6 +153,13 @@ void Channel::clearClientInChannel(Client *myClient)
 			this->_clients.erase(this->_clients.begin() + i);
 			break;
 		}
+	}
+	if (this->_clients.size() > 0 && this->_operators.size() == 0)
+	{
+		Client *newOp = this->_clients[0];
+		this->addOperator(newOp);
+		std::string msg = ":" + myClient->getPrefix() + " MODE " + this->_name + " +o " + newOp->getNickName();
+		this->sendChannelMessage(*myClient, msg);
 	}
 }
 
