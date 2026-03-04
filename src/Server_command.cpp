@@ -8,7 +8,17 @@ void Server::cmdCap(Client &cli, std::string cmd)
 		std::string msg = "CAP * LS";
 		cli.sendMessageOnClientFd(msg);
 	}
-	return ; // We don't support CAP so we ignore
+	return; // We don't support CAP so we ignore
+}
+
+void Server::cmdQuit(Client &cli, std::string cmd)
+{
+	(void)cmd;
+	// for (size_t i = 0; i < _channels.size(); i++)
+	// 	this->_channels[i]->clearClientInChannel(&cli);
+	// clearEmptyChannel();
+	// clearClient(cli.getFd());
+	cli.setToClean(1);
 }
 
 void Server::cmdPass(Client &myClient, std::string cmd)
@@ -20,7 +30,7 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 	{
 		std::string msg = ":ft_irc 461 " + myClient.getNickName() + " PASS :Not enough parameters";
 		myClient.sendMessageOnClientFd(msg);
-		return ;
+		return;
 	}
 	passWord = cmd.substr(nameStart + 1);
 	//?be more specifiques on the spaces rules for password
@@ -31,7 +41,7 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 		{
 			std::string msg = ":ft_irc 462 " + myClient.getNickName() + " :You may not reregister";
 			myClient.sendMessageOnClientFd(msg);
-			return ;
+			return;
 		}
 		myClient.setGrade(1);
 		// std::cout << myClient << std::endl;
@@ -41,20 +51,6 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 		std::string msg = ":ft_irc 464 " + myClient.getNickName() + " :Password incorrect";
 		myClient.sendMessageOnClientFd(msg);
 	}
-}
-
-
-void Server::cmdTest(Client &myClient, std::string cmd)
-{
-	std::cout << myClient << std::endl;
-	std::string passWord;
-	std::size_t nameStart = cmd.find_first_of(' ');
-	if (nameStart == cmd.size())
-		return;
-	passWord = cmd.substr(nameStart + 1);
-	//?be more specifiques on the spaces rules for password
-	myClient.setGrade(2);
-	myClient.setNickName(passWord);
 }
 
 void Server::broadcastNick(Client &cli, std::string &nick)
@@ -69,17 +65,17 @@ void Server::broadcastNick(Client &cli, std::string &nick)
 	// 		_channels[i]->sendChannelMessage(cli, msg);
 	// 	}
 	// }
-	if(this->_channels.size() == 1)
+	if (this->_channels.size() == 1)
 	{
 		// std::cout << "addresse cli use in broadacat " << &cli << std::endl;
-		std::cout << *_channels[0] << "\n" << std::endl;
+		std::cout << *_channels[0] << "\n"
+				  << std::endl;
 		if (_channels[0]->getClient(cli.getNickName()) != NULL)
 		{
 			std::string msg = ":" + cli.getPrefix() + " NICK :" + nick + "\n";
 			_channels[0]->sendChannelMessage(cli, msg);
 		}
 	}
-	
 }
 
 void Server::cmdNick(Client &myClient, std::string cmd)
@@ -91,7 +87,7 @@ void Server::cmdNick(Client &myClient, std::string cmd)
 	{
 		std::string msg = ":ft_irc 431 " + myClient.getNickName() + " :No nickname given";
 		myClient.sendMessageOnClientFd(msg);
-		return ;
+		return;
 	}
 	nickname = cmd.substr(nameStart + 1);
 	if (isValidString(nickname))
@@ -136,5 +132,23 @@ void Server::cmdUser(Client &myClient, std::string cmd)
 	if (!(myClient.getNickName()).empty() && myClient.getNickName() != "*")
 		myClient.setGrade(2);
 	// std::cout << myClient << std::endl;
+}
 
+void Server::clearEmptyChannel(void)
+{
+	std::vector<Channel *>::iterator it = _channels.begin();
+
+	while (it != _channels.end())
+	{
+		if ((*it)->getClientsSize() == 0)
+		{
+			std::cout << "Deleting empty channel : " << (*it)->getName() << std::endl;
+			it = _channels.erase(it);
+			// return; //!
+		}
+		else
+		{
+			it++;
+		}
+	}
 }

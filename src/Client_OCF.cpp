@@ -1,11 +1,11 @@
 #include "Client.hpp"
 
-Client::Client() : _authStatus(0), _nickName("*")
+Client::Client() : _authStatus(0),  _toClean(0), _nickName("*")
 {
 	return ;
 }
 
-Client::Client(int fd) : _fd(fd), _authStatus(0), _nickName("*")
+Client::Client(int fd) : _fd(fd), _authStatus(0),   _toClean(0), _nickName("*")
 {
 	// std::cout << "Client constructor called" << std::endl;
 	return ;
@@ -31,6 +31,8 @@ Client &Client::operator=(const Client &other)
 		this->_buff = other.getBuffer();
 		this->_realName = other.getRealName();
 		this->_IP = other.getIp();
+		this->_toClean = other._toClean;
+
 
 	}
 	return (*this);

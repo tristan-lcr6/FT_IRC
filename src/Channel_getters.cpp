@@ -25,6 +25,11 @@ const std::string &Channel::getTopic(void) const
 	return (this->_topic);
 }
 
+size_t Channel::getClientsSize(void) 
+{
+	return (this->_clients.size());
+}
+
 const std::string &Channel::getName(void) const
 {
 	return this->_name;

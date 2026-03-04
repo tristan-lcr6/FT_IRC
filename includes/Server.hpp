@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/03 19:17:36 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/04 14:35:09 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,13 @@ public:
     int findFdByNickName(std::string nickName);
     Channel &getChannel(std::string name);
     bool isAlreadyChannel(Channel **channel, const std::string &channel_name);
+    void Clean(Client *cli);
 
     // ************************************************************************** //
     // --- Command Execution (Execution.cpp) ---
     // ************************************************************************** //
     void execute(Client &cli, std::string cmd);
-    void ping(Client &cli, std::string cmd);
+    void cmdPing(Client &cli, std::string cmd);
 
     // ************************************************************************** //
     // --- IRC Commands (Dossier commands/) ---
@@ -99,7 +100,7 @@ public:
     void cmdUser(Client &cli, std::string cmd);
 
     // ************************************************************************** //
-    // Channel.cpp
+    // Server_Channel.cpp
     // ************************************************************************** //
     void cmdJoin(Client &cli, std::string cmd);
     void JoinMessage(std::string channelName, Client &cli);
@@ -109,9 +110,8 @@ public:
     void cmdInvite(Client &cli, std::string cmd);
     void cmdTopic(Client &cli, std::string cmd);
     void cmdPrivMsg(Client &cli, std::string cmd);
-
-    //! --- to RM  ---
-    void cmdTest(Client &myClient, std::string cmd);
+    void cmdQuit(Client &cli, std::string cmd);
+    void clearEmptyChannel(void);
 
     // ************************************************************************** //
     // --- Exceptions ---
