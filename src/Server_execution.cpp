@@ -18,7 +18,7 @@ static int parse(std::string cmd)
 	else
 		name = cmd;
 	std::string commands[12] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
-								"MODE", "KICK", "INVITE", "TOPIC", "1", "PING"};
+								"MODE", "KICK", "INVITE", "TOPIC", "QUIT", "PING"};
 	i = 0;
 	while (i < 11 && name != commands[i])
 		++i;
@@ -39,8 +39,8 @@ void Server::execute(Client &cli, std::string cmd)
 		&Server::cmdKick,
 		&Server::cmdInvite,
 		&Server::cmdTopic,
-		&Server::cmdTest,
-		&Server::ping
+		&Server::cmdQuit,
+		&Server::cmdPing
 
 	};
 	cmdIdx = parse(cmd);
@@ -92,7 +92,7 @@ void Server::execute(Client &cli, std::string cmd)
 	}
 }
 
-void Server::ping(Client &cli, std::string cmd)
+void Server::cmdPing(Client &cli, std::string cmd)
 {
 	std::vector<std::string> tokens = split(cmd, " ");
 	if (tokens[0] == "PING")

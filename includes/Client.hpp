@@ -1,24 +1,24 @@
 #ifndef CLIENT_HPP
-# define CLIENT_HPP
+#define CLIENT_HPP
 
-# include <iostream>
-# include <vector>
+#include <iostream>
+#include <vector>
 #include <sys/socket.h>
-
 
 class Client
 {
-  private:
+private:
 	int _fd;
 	int _authStatus;
+	bool _toClean;
 	std::string _nickName;
 	std::string _userName;
 	std::string _realName;
 	std::string _IP;
 	std::string _buff;
 
-  public:
-  	// ************************************************************************** //
+public:
+	// ************************************************************************** //
 	// Constructor / Destructor
 	// ************************************************************************** //
 	Client();
@@ -26,19 +26,21 @@ class Client
 	Client(const Client &other);
 	Client &operator=(const Client &other);
 	~Client();
-	
 
 	// ************************************************************************** //
 	// Setters
 	// ************************************************************************** //
 
 	int setFd(int fd);
+	void setToClean(int setVal);
 	std::string setIp(std::string ip);
 	void setGrade(int i);
 	void setNickName(std::string name);
 	void setRealName(std::string name);
 	void setUserName(std::string name);
 	std::string setBuffer(std::string str);
+	
+
 
 	// ************************************************************************** //
 	// Getters
@@ -54,7 +56,9 @@ class Client
 	std::string getRealName() const;
 	int getFd() const;
 	std::string getPrefix() const;
-	
+	bool getToClean() const;
+
+
 	// ************************************************************************** //
 	// Buffer management
 	// ************************************************************************** //
@@ -62,32 +66,32 @@ class Client
 	void addBuff(std::string data);
 	// void eraseBuffer(size_t start, size_t size);
 	void clearBuffer();
-	
+
 	// ************************************************************************** //
 	// Message management
 	// ************************************************************************** //
 	void sendMessageOnClientFd(std::string msg) const;
-	
+
 	bool operator!=(const Client &other);
 	bool operator==(const Client &c);
 
 	class ClientException : public std::exception
 	{
-		private : 
-		 	std::string _mess;
-		public :
-		ClientException(std::string mess) : _mess(mess){}
-		virtual ~ClientException() throw() {}
-        virtual const char* what() const throw() 
-        {
-            return _mess.c_str();
-        }
-	};
+	private:
+		std::string _mess;
 
+	public:
+		ClientException(std::string mess) : _mess(mess) {}
+		virtual ~ClientException() throw() {}
+		virtual const char *what() const throw()
+		{
+			return _mess.c_str();
+		}
+	};
 };
 
 std::ostream &operator<<(std::ostream &os, const Client &c);
 
-std::ostream& operator<<(std::ostream& dataStream, const std::vector<std::string>& vector);
+std::ostream &operator<<(std::ostream &dataStream, const std::vector<std::string> &vector);
 
 #endif

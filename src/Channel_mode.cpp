@@ -76,23 +76,23 @@ std::ostream &operator<<(std::ostream &os, const Channel &channel)
 	   << (channel.hasKey() ? "k" : "")
 	   << (channel.isLimited() ? "l" : "") << std::endl;
 
-	os << "Clients (Addresses) [" << channel._clients.size() << "]: " << std::endl;
-	for (size_t i = 0; i < channel._clients.size(); ++i)
-	{
-		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickName() << ")" << std::endl;
-	}
+	// os << "Clients (Addresses) [" << channel._clients.size() << "]: " << std::endl;
+	// for (size_t i = 0; i < channel._clients.size(); ++i)
+	// {
+	// 	os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickName() << ")" << std::endl;
+	// }
 
-	os << "Operators (Addresses) [" << channel._operators.size() << "]: " << std::endl;
-	for (size_t i = 0; i < channel._operators.size(); ++i)
-	{
-		os << "  - " << channel._operators[i] << std::endl;
-	}
+	// os << "Operators (Addresses) [" << channel._operators.size() << "]: " << std::endl;
+	// for (size_t i = 0; i < channel._operators.size(); ++i)
+	// {
+	// 	os << "  - " << channel._operators[i] << std::endl;
+	// }
 
-	os << "Invite List (Addresses) [" << channel._invite_list.size() << "]: " << std::endl;
-	for (size_t i = 0; i < channel._invite_list.size(); ++i)
-	{
-		os << "  - " << channel._invite_list[i] << std::endl;
-	}
+	// os << "Invite List (Addresses) [" << channel._invite_list.size() << "]: " << std::endl;
+	// for (size_t i = 0; i < channel._invite_list.size(); ++i)
+	// {
+	// 	os << "  - " << channel._invite_list[i] << std::endl;
+	// }
 
 	os << "====================================";
 	return os;

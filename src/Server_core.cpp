@@ -17,13 +17,15 @@ void Server::serverInit()
 				if (this->_fds[i].fd == this->_serSocketFd)
 					acceptNewClient();
 				else
+				{
 					receiveNewData(this->_fds[i].fd);
+					Clean(findClientByFd(this->_fds[i].fd));
+				}
 			}
 		}
 	}
 	closeServer();
 }
-
 
 void Server::serSocket()
 {
@@ -54,8 +56,6 @@ void Server::serSocket()
 	NewPoll.revents = 0;
 	this->_fds.push_back(NewPoll);
 }
-
-
 
 void Server::acceptNewClient()
 {
@@ -89,77 +89,39 @@ void Server::acceptNewClient()
 
 void Server::receiveNewData(int fd)
 {
-    Client *client = findClientByFd(fd);
-    if (!client)
-        return;
+	Client *client = findClientByFd(fd);
+	if (!client)
+		return;
 
-    char buff[1024];
-    ssize_t bytes = recv(fd, buff, sizeof(buff), 0); // receive the data
+	char buff[1024];
+	ssize_t bytes = recv(fd, buff, sizeof(buff), 0); // receive the data
 
-    if (bytes <= 0)
-    {
-        std::cout << RED << "Client <" << fd << "> Disconnected" << END << std::endl;
-        clearClient(fd);
-        close(fd);
-        return;
-    }
+	if (bytes <= 0)
+	{
+		std::cout << RED << "Client <" << fd << "> Disconnected" << END << std::endl;
+		clearClient(fd);
+		// close(fd);
+		return;
+	}
 
-    // Append received data to client's buffer
-    client->addBuff(std::string(buff, bytes));
+	// Append received data to client's buffer
+	client->addBuff(std::string(buff, bytes));
 
-    std::string &buffer = client->getBuffer();
-    size_t pos;
+	std::string &buffer = client->getBuffer();
+	size_t pos;
 
-    // Process ALL complete commands
-    while ((pos = buffer.find("\r\n")) != std::string::npos)
-    {
-        std::string line = buffer.substr(0, pos);
-        buffer.erase(0, pos + 2);
+	// Process ALL complete commands
+	while ((pos = buffer.find("\r\n")) != std::string::npos)
+	{
+		std::string line = buffer.substr(0, pos);
+		buffer.erase(0, pos + 2);
 
-        std::cout << YELLOW << "Client <" << fd << "> Parsed: " << line << END << std::endl;
+		std::cout << YELLOW << "Client <" << fd << "> Parsed: " << line << END << std::endl;
 
-        execute(*client, line);
-    }
+		execute(*client, line);
+	}
 }
 
-// void Server::receiveNewData(int fd)
-// {
-// 	Client *myClient = NULL;
-// 	char buff[1024];
-// 	size_t end_start;
-
-// 	myClient = &findClientByFd(fd);
-// 	std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
-
-// 	//-> buffer for the received data
-// 	std::memset(buff, 0, sizeof(buff));					 //-> clear the buffer
-// 	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1, 0); //-> receive the data
-// 	if (bytes <= 0)
-// 	{
-// 		std::cout << RED << "Client <" << fd << "> Disconnected" << END << std::endl;
-// 		clearClient(fd);
-// 		close(fd);
-// 	}
-// 	else
-// 	{
-// 		buff[bytes] = '\0';
-// 		std::cout << YELLOW << "Client <" << fd << "> Data: " << END << buff;
-// 		std::string myStr = buff;
-// 		(*myClient).addBuff(myStr);
-// 		if (myStr.find("\r\n") != std::string::npos)
-// 		{
-// 			end_start = (*myClient).getBuffer().find_first_of("\r\n");
-// 			(*myClient).setBuffer((*myClient).getBuffer().erase(end_start,
-// 																(*myClient).getBuffer().size()));
-// 			if (!myClient)
-// 				std::cout << RED << "Client lost" << END << std::endl;
-// 			else
-// 				execute(*myClient);
-// 			(*myClient).clearBuffer();
-// 		}
-// 		// std::cout << myClient.getBuffer() << std::endl;
-// 	}
-// }
 
 void Server::closeServer()
 {
@@ -180,7 +142,6 @@ void Server::closeServer()
 	}
 }
 
-
 void Server::clearClient(int fd)
 {
 	for (size_t i = 0; i < this->_fds.size(); i++)
@@ -195,12 +156,13 @@ void Server::clearClient(int fd)
 	{
 		if (this->_clients[i]->getFd() == fd)
 		{
+			delete (this->_clients[i]);
 			this->_clients.erase(this->_clients.begin() + i);
+			close(fd);
 			break;
 		}
 	}
 }
-
 
 void Server::signalHandler(int signum)
 {
@@ -208,4 +170,16 @@ void Server::signalHandler(int signum)
 	std::cout << std::endl
 			  << "Signal Received!" << std::endl;
 	Server::_signal = true;
+}
+
+void Server::Clean(Client *cli)
+{
+	if ((*cli).getToClean() == 1)
+	{
+		std::cout << RED << "Client <" << cli->getFd() << "> Disconnected" << END << std::endl;
+		for (size_t i = 0; i < _channels.size(); i++)
+			this->_channels[i]->clearClientInChannel(cli);
+		clearEmptyChannel();
+		clearClient((*cli).getFd());
+	}
 }

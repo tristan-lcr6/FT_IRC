@@ -124,3 +124,35 @@ void Channel::kick(Client &cli)
 	this->removeOperator(&cli);
 }
 
+
+void Channel::clearClientInChannel(Client *myClient)
+{
+
+	for (size_t i = 0; i < this->_operators.size(); i++)
+	{
+		if (this->_operators[i] == myClient)
+		{
+			this->_operators.erase(this->_operators.begin() + i);
+			break;
+		}
+	}
+	for (size_t i = 0; i < this->_invite_list.size(); i++)
+	{
+		if (this->_invite_list[i] == myClient)
+		{
+			this->_invite_list.erase(this->_invite_list.begin() + i);
+			break;
+		}
+	}
+	for (size_t i = 0; i < this->_clients.size(); i++)
+	{
+		if (this->_clients[i] == myClient)
+		{
+			this->_clients.erase(this->_clients.begin() + i);
+			break;
+		}
+	}
+}
+
+
+	

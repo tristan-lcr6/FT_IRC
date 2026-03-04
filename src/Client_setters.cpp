@@ -20,6 +20,10 @@ void Client::setGrade(int i)
 {
 	this->_authStatus = i;
 }
+void Client::setToClean(int setVal)
+{
+	_toClean = setVal;
+}
 
 void Client::setNickName(std::string name)
 {
