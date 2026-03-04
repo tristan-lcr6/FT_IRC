@@ -9,7 +9,6 @@ Channel::Channel(void) : _name("#default"), _i_mode(false), _t_mode(false), _k_m
 
 Channel::Channel(Client &cli, std::string name) : _name(name), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
 {
-	std::cout << "Adresse postjoin: " << &cli << std::endl;
 	this->_operators.push_back(&cli);
 	this->_clients.push_back(&cli);
 	//! need to be add to others vectors

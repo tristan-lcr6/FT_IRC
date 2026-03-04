@@ -19,7 +19,6 @@ Client *Server::findClientByFd(int fd)
 		if ((*it)->getFd() == fd)
 			return (*it);
 	}
-	// throw(std::exception);
 	return (NULL);
 }
 
