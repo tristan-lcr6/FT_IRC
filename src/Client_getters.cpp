@@ -1,5 +1,8 @@
 #include "Client.hpp"
 
+#define CYAN "\033[96m"
+#define END "\033[0m"
+
 int Client::getFd() const
 {
 	return (this->_fd);
@@ -45,7 +48,7 @@ std::string Client::getPrefix() const
 	std::string nickName = this->_nickName.empty() ? "Unnkown" : this->_nickName;
 	std::string userName = this->_userName.empty() ? "Unnkown" : this->_userName;
 	std::string IpAdd = this->_IP.empty() ? "Unnkown" : this->_IP;
-	return nickName + "!" + userName + "@" + IpAdd;
+	return (CYAN + nickName + "!" + userName + "@" + IpAdd + END);
 }
 
 bool Client::getToClean() const

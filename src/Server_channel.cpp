@@ -1,4 +1,6 @@
 #include "Server.hpp"
+#define CYAN "\033[96m"
+#define END "\033[0m"
 
 void Server::JoinMessage(Channel *channel, Client &cli)
 {
@@ -401,8 +403,8 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 	for (size_t i = 3; i < tokens.size(); i++)
 		message += " " + tokens[i];
 	std::string target = tokens[1];
-	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
-	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
+	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + CYAN + message + END;
+	
 	if (target[0] == '#')
 	{
 		if (getChannel(target).getClient(myClient.getNickName()) == NULL)

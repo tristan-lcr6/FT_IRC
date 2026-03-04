@@ -36,7 +36,7 @@ Client *Channel::getClient(std::string nick)
 		if (this->_clients[i]->getNickName() == nick)
 			return (this->_clients[i]);
 	}
-	std::cerr << "Client " << nick << " not found in channel " << this->_name << std::endl;
+	// std::cerr << "Client " << nick << " not found in channel " << this->_name << std::endl;//!message d'erreur print auqnd nick est appele par broadcast nick
 	return (NULL); //! Error client not found j'arrive pas a renvoyer NULL
 }
 
@@ -68,7 +68,6 @@ bool Channel::join(Client &cli)
 		cli.sendMessageOnClientFd(msg);
 		return false; //! erreur n'est pas invite
 	}
-	std::cout << "Adresse postjoin: " << &cli << std::endl;
 	this->_clients.push_back(&cli);
 	return true;
 }

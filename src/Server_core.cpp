@@ -98,9 +98,7 @@ void Server::receiveNewData(int fd)
 
 	if (bytes <= 0)
 	{
-		std::cout << RED << "Client <" << fd << "> Disconnected" << END << std::endl;
-		clearClient(fd);
-		// close(fd);
+		client->setToClean(1);
 		return;
 	}
 
@@ -115,13 +113,10 @@ void Server::receiveNewData(int fd)
 	{
 		std::string line = buffer.substr(0, pos);
 		buffer.erase(0, pos + 2);
-
 		std::cout << YELLOW << "Client <" << fd << "> Parsed: " << line << END << std::endl;
-
 		execute(*client, line);
 	}
 }
-
 
 void Server::closeServer()
 {
@@ -131,8 +126,8 @@ void Server::closeServer()
 		{
 			std::string msg = "ERROR :Server shutting down";
 			_clients[0]->sendMessageOnClientFd(msg);
-			std::cout << RED << "Client <" << this->_clients[0]->getFd() << "> Disconnected" << END << std::endl;
-			clearClient(this->_clients[0]->getFd());
+			_clients[0]->setToClean(1);
+			Clean(this->_clients[0]);
 		}
 	}
 	if (this->_serSocketFd != -1)
