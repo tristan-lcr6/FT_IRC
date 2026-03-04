@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/03 19:17:36 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/04 13:01:24 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ public:
     void serSocket();
     void acceptNewClient();
     void receiveNewData(int fd);
-    void closeFds();
+    void closeServer();
     void clearClient(int fd);
     static void signalHandler(int signum);
 
