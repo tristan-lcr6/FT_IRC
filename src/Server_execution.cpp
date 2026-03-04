@@ -81,7 +81,7 @@ void Server::execute(Client &cli, std::string cmd)
 			std::string msg =
 				":ft_irc 001 " + cli.getNickName() +
 				" :Welcome to the Internet Relay Network " +
-				cli.getPrefix() + "\r\n";
+				cli.getPrefix();
 
 			cli.sendMessageOnClientFd(msg);
 		}
