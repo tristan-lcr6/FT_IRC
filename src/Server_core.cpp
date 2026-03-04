@@ -62,7 +62,7 @@ void Server::acceptNewClient()
 	struct sockaddr_in cliadd;
 	struct pollfd NewPoll;
 	socklen_t len;
-	Client cli;
+	Client *cli = new Client();
 	int incofd;
 
 	len = sizeof(cliadd);
@@ -80,8 +80,8 @@ void Server::acceptNewClient()
 	NewPoll.fd = incofd;
 	NewPoll.events = POLLIN;
 	NewPoll.revents = 0;
-	cli.setFd(incofd);
-	cli.setIp(inet_ntoa(cliadd.sin_addr));
+	cli->setFd(incofd);
+	cli->setIp(inet_ntoa(cliadd.sin_addr));
 	this->_clients.push_back(cli);
 	this->_fds.push_back(NewPoll);
 	std::cout << GREEN << "Client <" << incofd << "> Connected" << END << std::endl;
@@ -165,11 +165,11 @@ void Server::closeFds()
 {
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i].getFd() != -1)
+		if (this->_clients[i]->getFd() != -1)
 		{
-			std::cout << RED << "Client <" << this->_clients[i].getFd() << "> Disconnected" << END << std::endl;
-			close(this->_clients[i].getFd());
-			this->_clients[i].setFd(-1);
+			std::cout << RED << "Client <" << this->_clients[i]->getFd() << "> Disconnected" << END << std::endl;
+			close(this->_clients[i]->getFd());
+			this->_clients[i]->setFd(-1);
 		}
 	}
 	if (this->_serSocketFd != -1)
@@ -192,7 +192,7 @@ void Server::clearClient(int fd)
 	}
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i].getFd() == fd)
+		if (this->_clients[i]->getFd() == fd)
 		{
 			this->_clients.erase(this->_clients.begin() + i);
 			break;

@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/03 19:16:11 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/03 19:17:36 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ private:
     static bool _signal;
     std::string _password;
 
-    std::vector<Client> _clients;
+    std::vector<Client *> _clients;
     std::vector<struct pollfd> _fds;
     std::vector<Channel *> _channels;
 

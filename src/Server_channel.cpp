@@ -238,13 +238,13 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 	bool found = false;
 	for (size_t i = 0; i < this->_clients.size(); i++)
 	{
-		if (this->_clients[i].getNickName() == nick)
+		if (this->_clients[i]->getNickName() == nick)
 		{
-			channel->invite(this->_clients[i]);
+			channel->invite(*this->_clients[i]);
 			std::string inviterMsg = ":ft_irc 341 " + cli.getNickName() + " " + nick + " " + channel_name;
 			std::string invitedMsg = ":" + cli.getNickName() + " INVITE " + nick + " :" + channel_name;
 			cli.sendMessageOnClientFd(inviterMsg);
-			this->_clients[i].sendMessageOnClientFd(invitedMsg);
+			this->_clients[i]->sendMessageOnClientFd(invitedMsg);
 			found = true;
 			break;
 		}
