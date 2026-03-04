@@ -21,7 +21,7 @@ void Server::serverInit()
 			}
 		}
 	}
-	closeFds();
+	closeServer();
 }
 
 
@@ -161,15 +161,16 @@ void Server::receiveNewData(int fd)
 // 	}
 // }
 
-void Server::closeFds()
+void Server::closeServer()
 {
-	for (size_t i = 0; i < this->_clients.size(); i++)
+	while (this->_clients.size() > 0)
 	{
-		if (this->_clients[i]->getFd() != -1)
+		if (this->_clients[0]->getFd() != -1)
 		{
-			std::cout << RED << "Client <" << this->_clients[i]->getFd() << "> Disconnected" << END << std::endl;
-			close(this->_clients[i]->getFd());
-			this->_clients[i]->setFd(-1);
+			std::string msg = "ERROR :Server shutting down";
+			_clients[0]->sendMessageOnClientFd(msg);
+			std::cout << RED << "Client <" << this->_clients[0]->getFd() << "> Disconnected" << END << std::endl;
+			clearClient(this->_clients[0]->getFd());
 		}
 	}
 	if (this->_serSocketFd != -1)
