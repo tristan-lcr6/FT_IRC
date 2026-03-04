@@ -5,12 +5,15 @@
 #include <vector>
 #include <cstdlib>
 #include <limits>
+#include <sstream>
+#include <ctime>
 
 class Channel
 {
 private:
 	std::string _name;
 	std::string _topic;
+	std::string _topicwhotime;
 	std::vector<Client *> _clients;
 	bool _i_mode;
 	std::vector<Client *> _invite_list;
@@ -41,7 +44,8 @@ public:
 	const std::string &getName(void) const;	 // returns name
 	const std::string &getTopic(void) const; // returns topic
 	const std::string &getKey(void) const; // returns password
-	std::string getClientList(void) const; // returns password
+	const std::string &getTopicWhoTime(void) const; // returns topicwhotime
+	std::string getClientList(void) const; // returns client list for NAMES
 	size_t getLimit(void); // returns client limit
 	size_t getClientsSize(void); // returns ClientsVector
 	bool isOperator(std::string nick) const;
@@ -55,7 +59,6 @@ public:
 	bool join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
 	void kick(Client &cli);
 	void clearClientInChannel(Client *myClient);
-	void clearEmptyChannel(void);
 
 	// ************************************************************************** //
 	// Operator management
@@ -73,7 +76,7 @@ public:
 	void setInviteOnly(bool b);		  // sets i_mode to b
 	void invite(Client &cli);		  // adds client to the invite list if i_mode is enabled
 	void setTopicOpOnly(bool b);	  // sets t_mode to b
-	void setTopic(std::string topic); // sets the topic
+	void setTopic(std::string topic, std::string prefix); // sets the topic
 
 	// ************************************************************************** //
 	// Mode management

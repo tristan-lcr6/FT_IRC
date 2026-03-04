@@ -98,7 +98,7 @@ void Server::receiveNewData(int fd)
 
 	if (bytes <= 0)
 	{
-		client->setToClean(1);
+		cmdQuit(*client, "QUIT");
 		return;
 	}
 

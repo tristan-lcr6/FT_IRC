@@ -12,6 +12,11 @@ void Server::JoinMessage(Channel *channel, Client &cli)
 	channel->sendChannelMessage(cli, ":" + prefix + " JOIN " + channelName);
 	cli.sendMessageOnClientFd(":" + prefix + " JOIN " + channelName);
 	this->cmdTopic(cli, "TOPIC " + channelName);
+	if (!channel->getTopic().empty())
+	{
+		std::string rpltopicwhotime = ":ft_irc 333 " + nick + " " + channelName + " " + channel->getTopicWhoTime();
+		cli.sendMessageOnClientFd(rpltopicwhotime);
+	}
 	this->cmdNames(cli, "NAMES " + channelName);
 }
 
@@ -32,7 +37,6 @@ void Server::cmdNames(Client &cli, std::string cmd)
 		return; //! Channel doesn't exist
 	}
 	std::string namrply = ":ft_irc 353 " + nick + " = " + channel_name + " :" + channel->getClientList();
-	std::cout << "client list: " << channel->getClientList() << std::endl;
 	cli.sendMessageOnClientFd(namrply);
 	cli.sendMessageOnClientFd(":ft_irc 366 " + nick + " " + channel_name + " :End of /NAMES list");
 }
@@ -366,7 +370,7 @@ void Server::cmdTopic(Client &cli, std::string cmd)
 	topic = tokens[2].substr(1);
 	for (size_t i = 3; i < tokens.size(); i++)
 		topic += " " + tokens[i];
-	channel->setTopic(topic);
+	channel->setTopic(topic, cli.getPrefix());
 	std::string msg = ":" + cli.getPrefix() + " TOPIC " + channel_name + " :" + topic;
 	channel->sendChannelMessage(cli, msg);
 	cli.sendMessageOnClientFd(msg);

@@ -45,9 +45,9 @@ std::string Client::getRealName() const
 
 std::string Client::getPrefix() const
 {
-	std::string nickName = this->_nickName.empty() ? "Unnkown" : this->_nickName;
-	std::string userName = this->_userName.empty() ? "Unnkown" : this->_userName;
-	std::string IpAdd = this->_IP.empty() ? "Unnkown" : this->_IP;
+	std::string nickName = this->_nickName.empty() ? "Unkown" : this->_nickName;
+	std::string userName = this->_userName.empty() ? "Unkown" : this->_userName;
+	std::string IpAdd = this->_IP.empty() ? "Unkown" : this->_IP;
 	return (CYAN + nickName + "!" + userName + "@" + IpAdd + END);
 }
 

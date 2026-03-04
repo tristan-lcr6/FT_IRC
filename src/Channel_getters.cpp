@@ -30,6 +30,11 @@ const std::string &Channel::getKey(void) const
 	return (this->_password);
 }
 
+const std::string &Channel::getTopicWhoTime(void) const
+{
+	return (this->_topicwhotime);
+}
+
 size_t Channel::getLimit(void)
 {
 	return (this->_client_limit);

@@ -13,11 +13,17 @@ void Server::cmdCap(Client &cli, std::string cmd)
 
 void Server::cmdQuit(Client &cli, std::string cmd)
 {
-	(void)cmd;
-	// for (size_t i = 0; i < _channels.size(); i++)
-	// 	this->_channels[i]->clearClientInChannel(&cli);
-	// clearEmptyChannel();
-	// clearClient(cli.getFd());
+	std::vector<std::string> tokens = split(cmd, ' ');
+	std::string reason = ":Client Quit";
+	if (tokens.size() > 1 && tokens[1][0] == ':')
+		reason = tokens[1];
+	std::string nick = cli.getNickName();
+	std::string msg = ":" + cli.getPrefix() + " QUIT " + reason;
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (this->_channels[i]->getClient(nick) != NULL)
+			this->_channels[i]->sendChannelMessage(cli, msg);
+	}
 	cli.setToClean(1);
 }
 
