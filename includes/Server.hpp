@@ -70,7 +70,7 @@ public:
     void serSocket();
     void acceptNewClient();
     void receiveNewData(int fd);
-    void closeFds();
+    void closeServer();
     void clearClient(int fd);
     static void signalHandler(int signum);
 

@@ -44,39 +44,39 @@ INVERTED = \033[7m
 INVERTED_E = \033[27m
 
 all:
-	@len=$$(echo "$(NAME)" | wc -m); pad=$$((len+13)); \
-	echo "$(CYAN)$(BOLD)╔$$(printf '═%.0s' $$(seq 1 $$pad))╗"; \
-	echo "║ Welcome to $(NAME)! ║"; \
-	echo "╚$$(printf '═%.0s' $$(seq 1 $$pad))╝$(DEFAULT)"
-	@echo "$(CYAN)$(BOLD)We are about to compile everything for you, this may take a while.$(DEFAULT)"
+	@len=$$(echo -e "$(NAME)" | wc -m); pad=$$((len+13)); \
+	echo -e "$(CYAN)$(BOLD)╔$$(printf '═%.0s' $$(seq 1 $$pad))╗"; \
+	echo -e "║ Welcome to $(NAME)! ║"; \
+	echo -e "╚$$(printf '═%.0s' $$(seq 1 $$pad))╝$(DEFAULT)"
+	@echo -e "$(CYAN)$(BOLD)We are about to compile everything for you, this may take a while.$(DEFAULT)"
 	@$(MAKE) --no-print-directory $(NAME)
 
 $(NAME): $(OBJ)
-	@echo "$(GREEN)All sources compiled!$(DEFAULT)"
-	@echo "$(YELLOW)Linking $@...$(DEFAULT)"
+	@echo -e "$(GREEN)All sources compiled!$(DEFAULT)"
+	@echo -e "$(YELLOW)Linking $@...$(DEFAULT)"
 	@$(CC) $(CFLAGS) $(OBJ) -o $@
-	@echo "$(GREEN)SUCCESS! You can now use $(BOLD)$(ITALIC)'./$@ $(NAME_ARGS)'$(DEFAULT)"
+	@echo -e "$(GREEN)SUCCESS! You can now use $(BOLD)$(ITALIC)'./$@ $(NAME_ARGS)'$(DEFAULT)"
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
 	@mkdir -p $(OBJ_DIR)
-	@echo "$(YELLOW)Compiling $<...$(DEFAULT)"
+	@echo -e "$(YELLOW)Compiling $<...$(DEFAULT)"
 	@$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 bonus: clean $(OBJ_BONUS)
-	@echo "$(GREEN)All sources compiled for the bonus!$(DEFAULT)"
-	@echo "$(YELLOW)Linking $(NAME)...$(DEFAULT)"
+	@echo -e "$(GREEN)All sources compiled for the bonus!$(DEFAULT)"
+	@echo -e "$(YELLOW)Linking $(NAME)...$(DEFAULT)"
 	@$(CC) $(CFLAGS) $(OBJ_BONUS) -o $(NAME)
-	@echo "$(GREEN)SUCCESS! You can now use $(BOLD)$(ITALIC)'./$(NAME) $(BONUS_ARGS)'$(DEFAULT)"
+	@echo -e "$(GREEN)SUCCESS! You can now use $(BOLD)$(ITALIC)'./$(NAME) $(BONUS_ARGS)'$(DEFAULT)"
 
 clean:
-	@echo "$(YELLOW)Erasing objects...$(DEFAULT)"
+	@echo -e "$(YELLOW)Erasing objects...$(DEFAULT)"
 	@rm -rf $(OBJ_DIR)
-	@echo "$(GREEN)Cleaned!$(DEFAULT)"
+	@echo -e "$(GREEN)Cleaned!$(DEFAULT)"
 
 fclean: clean
-	@echo "$(YELLOW)Erasing $(NAME)...$(DEFAULT)"
+	@echo -e "$(YELLOW)Erasing $(NAME)...$(DEFAULT)"
 	@rm -rf $(NAME)
-	@echo "$(GREEN)Everything fully cleaned!$(DEFAULT)"
+	@echo -e "$(GREEN)Everything fully cleaned!$(DEFAULT)"
 
 re: fclean all
 

@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:35 by jferrand          #+#    #+#             */
 /*   Updated: 2026/03/04 12:41:33 by tlecuyer         ###   ########.fr       */
@@ -32,7 +32,7 @@ int	main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
-		ser.closeFds();
+		ser.closeServer();
 		std::cerr << e.what() << std::endl;
 	}
 	std::cout << "The Server Closed!" << std::endl;
