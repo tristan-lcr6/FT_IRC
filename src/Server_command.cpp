@@ -23,7 +23,6 @@ void Server::cmdQuit(Client &cli, std::string cmd)
 
 void Server::cmdPass(Client &myClient, std::string cmd)
 {
-	std::cout << myClient << std::endl;
 	std::string passWord;
 	std::size_t nameStart = cmd.find_first_of(' ');
 	if (nameStart == cmd.size() || nameStart == std::string::npos)
@@ -34,7 +33,6 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 	}
 	passWord = cmd.substr(nameStart + 1);
 	//?be more specifiques on the spaces rules for password
-	std::cout << "passWord is '" << passWord << "'" << std::endl;
 	if (passWord == _password)
 	{
 		if (myClient.getAuthStatus() > 0)
@@ -44,7 +42,6 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 			return;
 		}
 		myClient.setGrade(1);
-		// std::cout << myClient << std::endl;
 	}
 	else
 	{
@@ -56,31 +53,18 @@ void Server::cmdPass(Client &myClient, std::string cmd)
 void Server::broadcastNick(Client &cli, std::string &nick)
 {
 
-	// for (size_t i = 0; i < this->_channels.size(); i++)
-	// {
-	// 	std::cout << "addresse cli use in broadacat " << &cli << std::endl;
-	// 	if (_channels[i]->getClient(cli.getNickName()) != NULL)
-	// 	{
-	// 		std::string msg = ":" + cli.getPrefix() + " NICK :" + nick + "\n";
-	// 		_channels[i]->sendChannelMessage(cli, msg);
-	// 	}
-	// }
-	if (this->_channels.size() == 1)
+	for (size_t i = 0; i < this->_channels.size(); i++)
 	{
-		// std::cout << "addresse cli use in broadacat " << &cli << std::endl;
-		std::cout << *_channels[0] << "\n"
-				  << std::endl;
-		if (_channels[0]->getClient(cli.getNickName()) != NULL)
+		if (_channels[i]->getClient(cli.getNickName()) != NULL)
 		{
 			std::string msg = ":" + cli.getPrefix() + " NICK :" + nick + "\n";
-			_channels[0]->sendChannelMessage(cli, msg);
+			_channels[i]->sendChannelMessage(cli, msg);
 		}
 	}
 }
 
 void Server::cmdNick(Client &myClient, std::string cmd)
 {
-	// std::cout << myClient << std::endl;
 	std::string nickname;
 	std::size_t nameStart = cmd.find_first_of(' ');
 	if (nameStart == cmd.size() || nameStart == std::string::npos)

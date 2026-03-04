@@ -1,4 +1,6 @@
 #include "Server.hpp"
+#define CYAN "\033[96m"
+#define END "\033[0m"
 
 void Server::JoinMessage(std::string channelName, Client &cli)
 {
@@ -54,7 +56,7 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 					this->_channels[j]->join(cli, passwords[i]);
 				else
 					this->_channels[j]->join(cli);
-				// std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
+				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
 				JoinMessage(name, cli);
 				found = true;
 				break;
@@ -62,10 +64,8 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 		}
 		if (!found)
 		{
-			std::cout << "Adresse prejoin: " << &cli << std::endl;
 			Channel *newChan = new Channel(cli, name);
 			this->_channels.push_back(newChan);
-			// std::cout << "Channel " << name << " created and client added." << std::endl;
 			std::cout << *newChan << std::endl;
 			JoinMessage(name, cli);
 		}
@@ -357,8 +357,8 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 	for (size_t i = 3; i < tokens.size(); i++)
 		message += " " + tokens[i];
 	std::string target = tokens[1];
-	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
-	// std::cout << "Message send looks like this -> " << formattedMsg << std::endl;
+	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + CYAN + message + END;
+	
 	if (target[0] == '#')
 	{
 		if (getChannel(target).getClient(myClient.getNickName()) == NULL)
