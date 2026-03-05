@@ -5,6 +5,8 @@
 #include <vector>
 #include <cstdlib>
 #include <limits>
+#include <sstream>
+#include <ctime>
 
 class client;
 class Channel
@@ -12,6 +14,7 @@ class Channel
 private:
 	std::string _name;
 	std::string _topic;
+	std::string _topicwhotime;
 	std::vector<Client *> _clients;
 	bool _i_mode;
 	std::vector<Client *> _invite_list;
@@ -42,19 +45,23 @@ public:
 	bool isLimited(void) const;				 // returns l_mode
 	const std::string &getName(void) const;	 // returns name
 	const std::string &getTopic(void) const; // returns topic
-	size_t getClientsSize(void);			 // returns ClientsVector
-	bool isOperator(std::string nick);
+	const std::string &getKey(void) const; // returns password
+	const std::string &getTopicWhoTime(void) const; // returns topicwhotime
+	std::string getClientList(void) const; // returns client list for NAMES
+	size_t getLimit(void); // returns client limit
+	size_t getClientsSize(void); // returns ClientsVector
+	bool isOperator(std::string nick) const;
 
 	// ************************************************************************** //
 	// Client management
 	// ************************************************************************** //
 
 	Client *getClient(std::string nick);	 // returns the client corresponding to the nickname
-	void join(Client &cli);					 // checks if the client can join and adds it to the clients list
-	void join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
+	bool join(Client &cli);					 // checks if the client can join and adds it to the clients list
+	bool join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
 	void kick(Client &cli);
 	void clearClientInChannel(Client *myClient);
-	void clearEmptyChannel(void);
+	void who(Client &cli);
 
 	// ************************************************************************** //
 	// Operator management
@@ -72,15 +79,15 @@ public:
 	void setInviteOnly(bool b);		  // sets i_mode to b
 	void invite(Client &cli);		  // adds client to the invite list if i_mode is enabled
 	void setTopicOpOnly(bool b);	  // sets t_mode to b
-	void setTopic(std::string topic); // sets the topic
+	void setTopic(std::string topic, std::string prefix); // sets the topic
 
 	// ************************************************************************** //
 	// Mode management
 	// ************************************************************************** //
 
 	static bool modeWithParam(char c, bool add);
-	void applyMode(char c, bool add);					 // applies the mode assigned to the char c
-	void applyMode(char c, bool add, std::string param); // applies the mode assigned to the char c with the params
+	void applyMode(Client &cli, char c, bool add);					 // applies the mode assigned to the char c
+	void applyMode(Client &cli, char c, bool add, std::string param); // applies the mode assigned to the char c with the params
 
 	// ************************************************************************** //
 	// Password / Limit

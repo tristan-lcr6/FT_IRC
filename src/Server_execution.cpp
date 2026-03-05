@@ -17,10 +17,10 @@ static int parse(std::string cmd)
 		name = cmd.substr(0, name_end);
 	else
 		name = cmd;
-	std::string commands[12] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
-								"MODE", "KICK", "INVITE", "TOPIC", "QUIT", "PING"};
+	std::string commands[14] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
+								"MODE", "KICK", "INVITE", "TOPIC", "NAMES", "WHO", "QUIT", "PING"};
 	i = 0;
-	while (i < 11 && name != commands[i])
+	while (i < 14 && name != commands[i])
 		++i;
 	return (i);
 }
@@ -39,12 +39,13 @@ void Server::execute(Client &cli, std::string cmd)
 		&Server::cmdKick,
 		&Server::cmdInvite,
 		&Server::cmdTopic,
+		&Server::cmdNames,
+		&Server::cmdWho,
 		&Server::cmdQuit,
 		&Server::cmdPing
-
 	};
 	cmdIdx = parse(cmd);
-	if (cmdIdx < 0 || cmdIdx > 11)
+	if (cmdIdx < 0 || cmdIdx > 13)
 	{
 		std::string msg = ":ft_irc 421 " + cli.getNickName() + " " + cmd + " :Unknown command";
 		cli.sendMessageOnClientFd(msg);
@@ -81,7 +82,7 @@ void Server::execute(Client &cli, std::string cmd)
 			std::string msg =
 				":ft_irc 001 " + cli.getNickName() +
 				" :Welcome to the Internet Relay Network " +
-				cli.getPrefix() + "\r\n";
+				cli.getPrefix();
 
 			cli.sendMessageOnClientFd(msg);
 		}

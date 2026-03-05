@@ -13,7 +13,17 @@ void Server::cmdCap(Client &cli, std::string cmd)
 
 void Server::cmdQuit(Client &cli, std::string cmd)
 {
-	(void)cmd;
+	std::vector<std::string> tokens = split(cmd, ' ');
+	std::string reason = ":Client Quit";
+	if (tokens.size() > 1 && tokens[1][0] == ':')
+		reason = tokens[1];
+	std::string nick = cli.getNickName();
+	std::string msg = ":" + cli.getPrefix() + " QUIT " + reason;
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (this->_channels[i]->getClient(nick) != NULL)
+			this->_channels[i]->sendChannelMessage(cli, msg);
+	}
 	cli.setToClean(1);
 }
 
@@ -108,10 +118,12 @@ void Server::cmdUser(Client &myClient, std::string cmd)
 		return;
 	}
 	myClient.setUserName(tokens[1]);
-	myClient.setRealName(tokens[4].substr(1));
+	std::string realname = tokens[4].substr(1);
+	for (size_t i = 5; i < tokens.size(); i++)
+		realname += " " + tokens[i];
+	myClient.setRealName(realname);
 	if (!(myClient.getNickName()).empty() && myClient.getNickName() != "*")
 		myClient.setGrade(2);
-	// std::cout << myClient << std::endl;
 }
 
 void Server::clearEmptyChannel(void)
@@ -122,13 +134,10 @@ void Server::clearEmptyChannel(void)
 	{
 		if ((*it)->getClientsSize() == 0)
 		{
-			std::cout << "Deleting empty channel : " << (*it)->getName() << std::endl;
+			delete (*it);
 			it = _channels.erase(it);
-			// return; //!
 		}
 		else
-		{
 			it++;
-		}
 	}
 }

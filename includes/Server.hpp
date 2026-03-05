@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
 /*   Updated: 2026/03/05 13:29:13 by tlecuyer         ###   ########.fr       */
@@ -26,6 +26,7 @@
 #include <iostream>
 #include <netinet/in.h> //-> for sockaddr_in
 #include <poll.h>       //-> for poll()
+#include <sstream>
 #include <sys/socket.h> //-> for socket()
 #include <sys/types.h>  //-> for socket()
 #include <unistd.h>     //-> for close()
@@ -103,8 +104,10 @@ public:
     // ************************************************************************** //
     // Server_Channel.cpp
     // ************************************************************************** //
+    void cmdNames(Client &cli, std::string cmd);
+    void cmdWho(Client &cli, std::string cmd);
     void cmdJoin(Client &cli, std::string cmd);
-    void JoinMessage(std::string channelName, Client &cli);
+    void JoinMessage(Channel *channel, Client &cli);
     void cmdMode(Client &cli, std::string cmd);
     void broadcastNick(Client &cli, std::string &nick);
     void cmdKick(Client &cli, std::string cmd);

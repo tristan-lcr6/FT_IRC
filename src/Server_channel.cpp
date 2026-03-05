@@ -2,23 +2,88 @@
 #define CYAN "\033[96m"
 #define END "\033[0m"
 
-void Server::JoinMessage(std::string channelName, Client &cli)
+void Server::JoinMessage(Channel *channel, Client &cli)
 {
-
+	std::string channelName = channel->getName();
 	std::string nick = cli.getNickName();
 	std::string user = cli.getUserName();
-	std::string host = "localhost"; // Ou l'IP réelle
-	std::string serverName = "irc.42.fr";
+	std::string serverName = "ft_irc";
 	std::string const prefix = cli.getPrefix();
-	cli.sendMessageOnClientFd(prefix + " JOIN " + channelName);
-	cli.sendMessageOnClientFd(prefix + " 332 " + channelName + " :Bienvenue sur " + channelName);
-	cli.sendMessageOnClientFd(":" + serverName + " 333 " + nick + " " + channelName + " " + nick + " 1672531200");
+	channel->sendChannelMessage(cli, ":" + prefix + " JOIN " + channelName);
+	cli.sendMessageOnClientFd(":" + prefix + " JOIN " + channelName);
+	this->cmdTopic(cli, "TOPIC " + channelName);
+	if (!channel->getTopic().empty())
+	{
+		std::string rpltopicwhotime = ":ft_irc 333 " + nick + " " + channelName + " " + channel->getTopicWhoTime();
+		cli.sendMessageOnClientFd(rpltopicwhotime);
+	}
+	this->cmdNames(cli, "NAMES " + channelName);
+}
 
-	// 4. Envoyer la liste des noms (RPL_NAMsendMessageOnClientFd 353)
-	// Ici tu dois boucler sur tous les membres du channel pour construire la liste
-	// std::string list = "@" + nick + " member2 member3";
-	// cli.sendMessageOnClientFd(":" + serverName + " 353 " + nick + " = " + channelName + " :" + list);
-	// cli.sendMessageOnClientFd(":" + serverName + " 366 " + nick + " " + channelName + " :End of /NAMES list");
+// NAMES [channel]
+// prints all the clients of the channel
+void Server::cmdNames(Client &cli, std::string cmd)
+{
+	std::vector<std::string> tokens = split(cmd, ' ');
+	std::string nick = cli.getNickName();
+	if (tokens.size() < 2)
+		return ; // We don't support NAMES without param
+	std::string channel_name = tokens[1];
+	Channel *channel = NULL;
+	if (!this->isAlreadyChannel(&channel, channel_name))
+	{
+		std::string msg = ":ft_irc 403 " + nick + " " + channel_name + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Channel doesn't exist
+	}
+	std::string namrply = ":ft_irc 353 " + nick + " = " + channel_name + " :" + channel->getClientList();
+	cli.sendMessageOnClientFd(namrply);
+	cli.sendMessageOnClientFd(":ft_irc 366 " + nick + " " + channel_name + " :End of /NAMES list");
+}
+
+// WHO <mask>
+// mask = channel or nick
+// prints ":server 352 <requester> <channel> <user> <host> <server> <nick> <flags> :<hopcount> <realname>"
+// for each user in the channel or just the nick
+void Server::cmdWho(Client &cli, std::string cmd)
+{
+	std::vector<std::string> tokens = split(cmd, ' ');
+	std::string nick = cli.getNickName();
+	if (tokens.size() < 2)
+	{
+		std::string msg = ":ft_irc 461 " + nick + " WHO :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
+		return ;
+	}
+	std::string mask = tokens[1];
+	if (mask[0] != '#')
+	{
+		for (size_t i = 0; i < this->_clients.size(); i++)
+		{
+			if (mask == this->_clients[i]->getNickName())
+			{
+				std::string msg = ":ft_irc 352 " + nick + " * ";
+				msg += this->_clients[i]->getUserName() + " ";
+				msg += this->_clients[i]->getIp() + " ft_irc ";
+				msg += this->_clients[i]->getNickName() + " H :0 ";
+				msg += this->_clients[i]->getRealName();
+				cli.sendMessageOnClientFd(msg);
+				cli.sendMessageOnClientFd(":ft_irc 315 " + nick + " " + mask + ":End of WHO list");
+				return ;
+			}
+		}
+		std::string msg = ":ft_irc 401 " + nick + " " + mask + " :No such nick";
+		cli.sendMessageOnClientFd(msg);
+		return ;
+	}
+	Channel *channel = NULL;
+	if (!this->isAlreadyChannel(&channel, mask))
+	{
+		std::string msg = ":ft_irc 403 " + nick + " " + mask + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Channel doesn't exist
+	}
+	channel->who(cli);
 }
 
 // JOIN #a,#b,#c passA,passB,passC
@@ -51,13 +116,15 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 		{
 			if (name == this->_channels[j]->getName())
 			{
-				std::cout << "Adresse prejoin: " << &cli << std::endl;
+				if (this->_channels[j]->getClient(cli.getNickName()) != NULL)
+					return ; //client already in channel
+				bool joined;
 				if (i < passwords.size())
-					this->_channels[j]->join(cli, passwords[i]);
+					joined = this->_channels[j]->join(cli, passwords[i]);
 				else
-					this->_channels[j]->join(cli);
-				std::cout << "join existing channel" << *(this->_channels[j]) << std::endl;
-				JoinMessage(name, cli);
+					joined = this->_channels[j]->join(cli);
+				if (joined)
+					JoinMessage(this->_channels[j], cli);
 				found = true;
 				break;
 			}
@@ -67,22 +134,17 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 			Channel *newChan = new Channel(cli, name);
 			this->_channels.push_back(newChan);
 			std::cout << *newChan << std::endl;
-			JoinMessage(name, cli);
+			JoinMessage(newChan, cli);
 		}
 	}
 }
 
 // MODE <channel> <modes> [params]
-// MODE #test +i
-// MODE #test +k secret
-// MODE #test +o jesus
-// MODE #test +l 10
-// MODE #test -k
 // Verifies that cli is an operator then executes the asked action
 void Server::cmdMode(Client &cli, std::string cmd)
 {
 	std::vector<std::string> tokens = split(cmd, ' ');
-	if (tokens.size() < 3)
+	if (tokens.size() < 2)
 	{
 		std::string msg = ":ft_irc 461 " + cli.getNickName() + " MODE :Not enough parameters";
 		cli.sendMessageOnClientFd(msg);
@@ -98,7 +160,40 @@ void Server::cmdMode(Client &cli, std::string cmd)
 		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
-	if (channel->getClient(cli.getNickName()) == NULL || !channel->isOperator(cli.getNickName()))
+	if (channel->getClient(cli.getNickName()) == NULL)
+	{
+		std::string msg = ":ft_irc 442 " + cli.getNickName() + " " + channel_name + " :You're not on that channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Client not in channel
+	}
+	if (tokens.size() == 2)
+	{
+		std::string msg = ":ft_irc 324 " + cli.getNickName() + " " + channel_name + " +";
+		std::string params;
+		if (channel->isInviteOnly())
+			msg += "i";
+		if (channel->isTopicOpOnly())
+			msg += "t";
+		if (channel->hasKey())
+		{
+			msg += "k";
+			params = channel->getKey();
+		}
+		if (channel->isLimited())
+		{
+			msg += "l";
+			if (!params.empty())
+				params += " ";
+			std::stringstream ss;
+			ss << channel->getLimit();
+			params += ss.str();
+		}
+		if (!params.empty())
+			msg += " " + params;
+		cli.sendMessageOnClientFd(msg);
+		return ;
+	}
+	if (!channel->isOperator(cli.getNickName()))
 	{
 		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
 		cli.sendMessageOnClientFd(msg);
@@ -131,10 +226,10 @@ void Server::cmdMode(Client &cli, std::string cmd)
 				cli.sendMessageOnClientFd(msg);
 				continue; //! error not enough params
 			}
-			channel->applyMode(c, add, params[paramIdx++]);
+			channel->applyMode(cli, c, add, params[paramIdx++]);
 		}
 		else
-			channel->applyMode(c, add);
+			channel->applyMode(cli, c, add);
 	}
 }
 
@@ -247,7 +342,7 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 		{
 			channel->invite(*this->_clients[i]);
 			std::string inviterMsg = ":ft_irc 341 " + cli.getNickName() + " " + nick + " " + channel_name;
-			std::string invitedMsg = ":" + cli.getNickName() + " INVITE " + nick + " :" + channel_name;
+			std::string invitedMsg = ":" + cli.getPrefix() + " INVITE " + nick + " :" + channel_name;
 			cli.sendMessageOnClientFd(inviterMsg);
 			this->_clients[i]->sendMessageOnClientFd(invitedMsg);
 			found = true;
@@ -320,7 +415,7 @@ void Server::cmdTopic(Client &cli, std::string cmd)
 	topic = tokens[2].substr(1);
 	for (size_t i = 3; i < tokens.size(); i++)
 		topic += " " + tokens[i];
-	channel->setTopic(topic);
+	channel->setTopic(topic, cli.getPrefix());
 	std::string msg = ":" + cli.getPrefix() + " TOPIC " + channel_name + " :" + topic;
 	channel->sendChannelMessage(cli, msg);
 	cli.sendMessageOnClientFd(msg);
@@ -347,7 +442,7 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 		myClient.sendMessageOnClientFd(msg);
 		return;
 	}
-	if (tokens.size() < 3 || tokens[2][0] != ':' || tokens[2].size() == 1)
+	if (tokens.size() < 3 || tokens[2][0] != ':' || (tokens[2].size() == 1 && tokens.size() == 3))
 	{
 		std::string msg = ":ft_irc 412 " + myClient.getNickName() + " :No text to send";
 		myClient.sendMessageOnClientFd(msg);

@@ -40,9 +40,13 @@ void Channel::removePassword(void)
 	this->_password.clear();
 }
 
-void Channel::setTopic(std::string topic)
+void Channel::setTopic(std::string topic, std::string prefix)
 {
 	this->_topic = topic;
+	time_t now = time(NULL);
+	std::stringstream ss;
+	ss << prefix << " " << now;
+	this->_topicwhotime = ss.str();
 }
 
 void Channel::invite(Client &cli)
