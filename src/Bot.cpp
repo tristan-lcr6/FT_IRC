@@ -66,17 +66,17 @@ void Bot::handleMessage(Client *cli, Channel *channel, std::string message)
 
 void Bot::sendWeather(Channel *channel)
 {
-    std::string message = _name + "!" + "Bot42-fr" + "@" + "127.0.0.1";
+    std::string message = ":" + _name + "!Bot42-fr@127.0.0.1 PRIVMSG " + channel->getName() + " :";
     size_t index = rand() % 3;
-    message += " " + _weatherStr[index];
+    message += _weatherStr[index];
     channel->sendChannelMessageBot(message);
 }
 
 void Bot::sendInsult(Client *cli, Channel *channel)
 {
-    std::string message = _name + "!" + "Bot42-fr" + "@" + "127.0.0.1";
+    std::string message = ":" + _name + "!Bot42-fr@127.0.0.1 PRIVMSG " + channel->getName() + " :";
     size_t index = rand() % 4;
-    message += " " + cli->getNickName() + _insultStr[index];
+    message += cli->getNickName() + _insultStr[index];
     channel->sendChannelMessageBot(message);
 }
 
