@@ -20,6 +20,32 @@ void Server::JoinMessage(Channel *channel, Client &cli)
 	this->cmdNames(cli, "NAMES " + channelName);
 }
 
+void Server::cmdBot(Client &cli, std::string cmd)
+{
+	std::string channelName;
+	Channel *channel;
+	std::vector<std::string> tokens = split(cmd, ' ');
+	if (!this->isAlreadyChannel(&channel, channelName))
+	{
+		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channelName + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Channel doesn't exist
+	}
+	if (channel->getClient(cli.getNickName()) == NULL)
+	{
+		std::string msg = ":ft_irc 442 " + cli.getNickName() + " " + channelName + " :You're not on that channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Client not in channel
+	}
+	channel->botActiv();
+	std::string message;
+	if (channel->getBot().getActiv())
+		message = ":" + cli.getPrefix() + " PRIVMSG " + channelName + " : BOT activated.";
+	else
+		message = ":" + cli.getPrefix() + " PRIVMSG " + channelName + " : BOT deactivated.";
+	getChannel(channelName).sendChannelMessageBot(message);
+}
+
 // NAMES [channel]
 // prints all the clients of the channel
 void Server::cmdNames(Client &cli, std::string cmd)
