@@ -226,10 +226,10 @@ void Server::cmdMode(Client &cli, std::string cmd)
 				cli.sendMessageOnClientFd(msg);
 				continue; //! error not enough params
 			}
-			channel->applyMode(c, add, params[paramIdx++]);
+			channel->applyMode(cli, c, add, params[paramIdx++]);
 		}
 		else
-			channel->applyMode(c, add);
+			channel->applyMode(cli, c, add);
 	}
 }
 
@@ -342,7 +342,7 @@ void Server::cmdInvite(Client &cli, std::string cmd)
 		{
 			channel->invite(*this->_clients[i]);
 			std::string inviterMsg = ":ft_irc 341 " + cli.getNickName() + " " + nick + " " + channel_name;
-			std::string invitedMsg = ":" + cli.getNickName() + " INVITE " + nick + " :" + channel_name;
+			std::string invitedMsg = ":" + cli.getPrefix() + " INVITE " + nick + " :" + channel_name;
 			cli.sendMessageOnClientFd(inviterMsg);
 			this->_clients[i]->sendMessageOnClientFd(invitedMsg);
 			found = true;

@@ -84,8 +84,8 @@ public:
 	// ************************************************************************** //
 
 	static bool modeWithParam(char c, bool add);
-	void applyMode(char c, bool add);					 // applies the mode assigned to the char c
-	void applyMode(char c, bool add, std::string param); // applies the mode assigned to the char c with the params
+	void applyMode(Client &cli, char c, bool add);					 // applies the mode assigned to the char c
+	void applyMode(Client &cli, char c, bool add, std::string param); // applies the mode assigned to the char c with the params
 
 	// ************************************************************************** //
 	// Password / Limit
