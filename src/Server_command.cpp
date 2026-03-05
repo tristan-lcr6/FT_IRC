@@ -118,10 +118,12 @@ void Server::cmdUser(Client &myClient, std::string cmd)
 		return;
 	}
 	myClient.setUserName(tokens[1]);
-	myClient.setRealName(tokens[4].substr(1));
+	std::string realname = tokens[4].substr(1);
+	for (size_t i = 5; i < tokens.size(); i++)
+		realname += " " + tokens[i];
+	myClient.setRealName(realname);
 	if (!(myClient.getNickName()).empty() && myClient.getNickName() != "*")
 		myClient.setGrade(2);
-	// std::cout << myClient << std::endl;
 }
 
 void Server::clearEmptyChannel(void)
@@ -131,7 +133,10 @@ void Server::clearEmptyChannel(void)
 	while (it != _channels.end())
 	{
 		if ((*it)->getClientsSize() == 0)
+		{
+			delete (*it);
 			it = _channels.erase(it);
+		}
 		else
 			it++;
 	}

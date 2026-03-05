@@ -14,11 +14,12 @@ bool Channel::modeWithParam(char c, bool add)
 	return false;
 }
 
-void Channel::applyMode(char c, bool add)
+void Channel::applyMode(Client &cli, char c, bool add)
 {
 	if (modeWithParam(c, add))
 	{
-		std::cerr << "Error: tried to apply mode " << c << " without params" << std::endl;
+		std::string msg = ":ft_irc 461 " + cli.getNickName() + " MODE :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
 		return; //! error mode needs param
 	}
 	switch (c)
@@ -36,13 +37,22 @@ void Channel::applyMode(char c, bool add)
 		this->removeClientLimit();
 		break;
 	default:
-		std::cerr << "Error: tried to apply an unknown mode: " << c << std::endl;
+		std::string msg = ":ft_irc 472 " + cli.getNickName() + " " + c + " :is unknown mode char to me";
+		cli.sendMessageOnClientFd(msg);
 		//! error unknown mode
-		break;
+		return;
 	}
+	std::string msg = ":" + cli.getPrefix() + " MODE " + this->_name + " ";
+	if (add)
+		msg += "+";
+	else
+		msg += "-";
+	msg.push_back(c);
+	cli.sendMessageOnClientFd(msg);
+	this->sendChannelMessage(cli, msg);
 }
 
-void Channel::applyMode(char c, bool add, std::string param)
+void Channel::applyMode(Client &cli, char c, bool add, std::string param)
 {
 	switch (c)
 	{
@@ -59,10 +69,22 @@ void Channel::applyMode(char c, bool add, std::string param)
 		this->setClientLimit(param);
 		break;
 	default:
-		std::cerr << "Error: tried to apply an unknown mode: " << c << std::endl;
+		std::string msg = ":ft_irc 472 " + cli.getNickName() + " ";
+		msg.push_back(c);
+		msg += " :is unknown mode char to me";
+		cli.sendMessageOnClientFd(msg);
 		//! error unknown mode
-		break;
+		return;
 	}
+	std::string msg = ":" + cli.getPrefix() + " MODE " + this->_name + " ";
+	if (add)
+		msg += "+";
+	else
+		msg += "-";
+	msg.push_back(c);
+	msg += " " + param;
+	cli.sendMessageOnClientFd(msg);
+	this->sendChannelMessage(cli, msg);
 }
 
 std::ostream &operator<<(std::ostream &os, const Channel &channel)
