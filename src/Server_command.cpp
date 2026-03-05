@@ -14,10 +14,6 @@ void Server::cmdCap(Client &cli, std::string cmd)
 void Server::cmdQuit(Client &cli, std::string cmd)
 {
 	(void)cmd;
-	// for (size_t i = 0; i < _channels.size(); i++)
-	// 	this->_channels[i]->clearClientInChannel(&cli);
-	// clearEmptyChannel();
-	// clearClient(cli.getFd());
 	cli.setToClean(1);
 }
 

@@ -1,4 +1,6 @@
 #include "Channel.hpp"
+#include "Client.hpp"
+
 
 void Channel::addOperator(Client *cli)
 {

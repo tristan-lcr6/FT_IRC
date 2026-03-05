@@ -1,13 +1,16 @@
 #include "Channel.hpp"
+#include "Client.hpp"
+#include "Bot.hpp"
+
 
 // Default constructor
-Channel::Channel(void) : _name("#default"), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
+Channel::Channel(void) : _name("#default"), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false), _bot("SuperWeatherBot")
 {
 	// std::cout << "Default constructor called" << std::endl;
 	return;
 }
 
-Channel::Channel(Client &cli, std::string name) : _name(name), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false)
+Channel::Channel(Client &cli, std::string name) : _name(name), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false), _bot("SuperWeatherBot")
 {
 	this->_operators.push_back(&cli);
 	this->_clients.push_back(&cli);
@@ -30,6 +33,7 @@ Channel::Channel(const Channel &other)
 	this->_operators = other._operators;
 	this->_l_mode = other._l_mode;
 	this->_client_limit = other._client_limit;
+	this->_bot = other._bot;
 	return;
 }
 
@@ -48,6 +52,8 @@ Channel &Channel::operator=(const Channel &other)
 	this->_operators = other._operators;
 	this->_l_mode = other._l_mode;
 	this->_client_limit = other._client_limit;
+	this->_bot = other._bot;
+
 	return (*this);
 }
 

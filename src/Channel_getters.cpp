@@ -1,4 +1,6 @@
 #include "Channel.hpp"
+#include "Client.hpp"
+
 
 bool Channel::isInviteOnly(void) const
 {

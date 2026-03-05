@@ -357,7 +357,7 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 	for (size_t i = 3; i < tokens.size(); i++)
 		message += " " + tokens[i];
 	std::string target = tokens[1];
-	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + CYAN + message + END;
+	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
 	
 	if (target[0] == '#')
 	{
