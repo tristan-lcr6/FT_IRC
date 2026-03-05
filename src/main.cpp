@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:35 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/04 12:41:33 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/05 14:19:24 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int	main(int argc, char **argv)
 	if (atoi(argv[1]) < 1024 || atoi(argv[1]) > 65535)
 		return ((std::cout << "Irc error : Bad arguments " << std::endl), 1);
 	std::cout << "---- SERVER ----" << std::endl;
+    srand(time(NULL));
 	ser.setPassword(argv[2]);
 	ser.setPort(atoi(argv[1]));
 	try

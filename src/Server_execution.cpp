@@ -104,7 +104,7 @@ void Server::cmdPing(Client &cli, std::string cmd)
 			return;
 		}
 		std::string param = tokens[1];
-		std::string response = ":our_ft_irc.fr PONG :" + param + "\r\n";
-		send(cli.getFd(), response.c_str(), response.length(), 0);
+		std::string response = ":ft_irc.fr PONG :" + param + "\r\n";
+		cli.sendMessageOnClientFd(response);
 	}
 }

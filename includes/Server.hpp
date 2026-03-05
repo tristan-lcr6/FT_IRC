@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/05 12:46:08 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/05 13:29:13 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define SERVER_HPP
 
 #include "Channel.hpp"
+#include "Bot.hpp"
 #include "utils.hpp"
 #include "Client.hpp"
 #include <arpa/inet.h> //-> for inet_ntoa()

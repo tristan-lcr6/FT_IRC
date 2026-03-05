@@ -1,13 +1,14 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
-#include "Client.hpp"
+#include "Bot.hpp"
 #include <vector>
 #include <cstdlib>
 #include <limits>
 #include <sstream>
 #include <ctime>
 
+class client;
 class Channel
 {
 private:
@@ -23,6 +24,7 @@ private:
 	std::vector<Client *> _operators;
 	bool _l_mode;
 	size_t _client_limit;
+	Bot _bot;
 
 public:
 	// ************************************************************************** //
@@ -101,8 +103,9 @@ public:
 	// Messaging
 	// ************************************************************************** //
 	void sendChannelMessage(Client &myClient, std::string message); // sen message to all client in named channel
+	void sendChannelMessageBot(std::string message); // send message by bot to all client in named channel
 
-	friend std::ostream &operator<<(std::ostream &os, const Channel &channel);
+		friend std::ostream &operator<<(std::ostream &os, const Channel &channel);
 };
 
 #include <iostream>
