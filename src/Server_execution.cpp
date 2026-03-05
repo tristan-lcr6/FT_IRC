@@ -17,10 +17,10 @@ static int parse(std::string cmd)
 		name = cmd.substr(0, name_end);
 	else
 		name = cmd;
-	std::string commands[14] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
-								"MODE", "KICK", "INVITE", "TOPIC", "NAMES", "WHO", "QUIT", "PING"};
+	std::string commands[15] = {"CAP", "PASS", "NICK", "USER", "JOIN", "PRIVMSG",
+								"MODE", "KICK", "INVITE", "TOPIC", "NAMES", "WHO", "QUIT", "PING", "BOT"};
 	i = 0;
-	while (i < 14 && name != commands[i])
+	while (i < 15 && name != commands[i])
 		++i;
 	return (i);
 }
@@ -42,10 +42,11 @@ void Server::execute(Client &cli, std::string cmd)
 		&Server::cmdNames,
 		&Server::cmdWho,
 		&Server::cmdQuit,
-		&Server::cmdPing
+		&Server::cmdPing,
+		&Server::cmdBot
 	};
 	cmdIdx = parse(cmd);
-	if (cmdIdx < 0 || cmdIdx > 13)
+	if (cmdIdx < 0 || cmdIdx > 14)
 	{
 		std::string msg = ":ft_irc 421 " + cli.getNickName() + " " + cmd + " :Unknown command";
 		cli.sendMessageOnClientFd(msg);

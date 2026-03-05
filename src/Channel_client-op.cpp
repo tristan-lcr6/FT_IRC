@@ -1,7 +1,6 @@
 #include "Channel.hpp"
 #include "Client.hpp"
 
-
 void Channel::addOperator(Client *cli)
 {
 	this->_operators.push_back(cli);
@@ -127,6 +126,11 @@ void Channel::kick(Client &cli)
 	this->removeOperator(&cli);
 }
 
+void Channel::botActiv()
+{
+	this->getBot().switchActiv();
+}
+
 void Channel::who(Client &cli)
 {
 	std::string nick = cli.getNickName();
@@ -145,7 +149,7 @@ void Channel::who(Client &cli)
 		}
 	}
 	cli.sendMessageOnClientFd(":ft_irc 315 " + nick + " " + this->_name + ":End of WHO list");
-	return ;
+	return;
 }
 
 void Channel::clearClientInChannel(Client *myClient)
@@ -183,6 +187,3 @@ void Channel::clearClientInChannel(Client *myClient)
 		this->sendChannelMessage(*myClient, msg);
 	}
 }
-
-
-	

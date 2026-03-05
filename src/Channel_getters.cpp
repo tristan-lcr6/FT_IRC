@@ -76,3 +76,9 @@ bool Channel::isOperator(std::string nick) const
 	}
 	return (false);
 }
+
+
+Bot &Channel::getBot()
+{
+    return (this->_bot);
+}

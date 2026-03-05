@@ -27,7 +27,7 @@ void Server::cmdNames(Client &cli, std::string cmd)
 	std::vector<std::string> tokens = split(cmd, ' ');
 	std::string nick = cli.getNickName();
 	if (tokens.size() < 2)
-		return ; // We don't support NAMES without param
+		return; // We don't support NAMES without param
 	std::string channel_name = tokens[1];
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(&channel, channel_name))
@@ -53,7 +53,7 @@ void Server::cmdWho(Client &cli, std::string cmd)
 	{
 		std::string msg = ":ft_irc 461 " + nick + " WHO :Not enough parameters";
 		cli.sendMessageOnClientFd(msg);
-		return ;
+		return;
 	}
 	std::string mask = tokens[1];
 	if (mask[0] != '#')
@@ -69,12 +69,12 @@ void Server::cmdWho(Client &cli, std::string cmd)
 				msg += this->_clients[i]->getRealName();
 				cli.sendMessageOnClientFd(msg);
 				cli.sendMessageOnClientFd(":ft_irc 315 " + nick + " " + mask + ":End of WHO list");
-				return ;
+				return;
 			}
 		}
 		std::string msg = ":ft_irc 401 " + nick + " " + mask + " :No such nick";
 		cli.sendMessageOnClientFd(msg);
-		return ;
+		return;
 	}
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(&channel, mask))
@@ -96,7 +96,7 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 	{
 		std::string msg = ":ft_irc 461 " + cli.getNickName() + " JOIN :Not enough parameters";
 		cli.sendMessageOnClientFd(msg);
-		return ;
+		return;
 	}
 	std::vector<std::string> channels = split(tokens[1], ',');
 	std::vector<std::string> passwords;
@@ -117,7 +117,7 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 			if (name == this->_channels[j]->getName())
 			{
 				if (this->_channels[j]->getClient(cli.getNickName()) != NULL)
-					return ; //client already in channel
+					return; // client already in channel
 				bool joined;
 				if (i < passwords.size())
 					joined = this->_channels[j]->join(cli, passwords[i]);
@@ -133,7 +133,6 @@ void Server::cmdJoin(Client &cli, std::string cmd)
 		{
 			Channel *newChan = new Channel(cli, name);
 			this->_channels.push_back(newChan);
-			std::cout << *newChan << std::endl;
 			JoinMessage(newChan, cli);
 		}
 	}
@@ -152,7 +151,7 @@ void Server::cmdMode(Client &cli, std::string cmd)
 	}
 	std::string channel_name = tokens[1];
 	if (channel_name[0] != '#')
-		return ; //* ignore user modes
+		return; //* ignore user modes
 	Channel *channel = NULL;
 	if (!this->isAlreadyChannel(&channel, channel_name))
 	{
@@ -191,7 +190,7 @@ void Server::cmdMode(Client &cli, std::string cmd)
 		if (!params.empty())
 			msg += " " + params;
 		cli.sendMessageOnClientFd(msg);
-		return ;
+		return;
 	}
 	if (!channel->isOperator(cli.getNickName()))
 	{
@@ -453,24 +452,23 @@ void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 		message += " " + tokens[i];
 	std::string target = tokens[1];
 	std::string formattedMsg = ":" + myClient.getPrefix() + " PRIVMSG " + target + " :" + message;
-	
+	Channel *channel = NULL;
 	if (target[0] == '#')
 	{
-		if (getChannel(target).getClient(myClient.getNickName()) == NULL)
+		if (!this->isAlreadyChannel(&channel, target))
+		{
+			std::string msg = ":ft_irc 403 " + myClient.getNickName() + " " + target + " :No such channel";
+			myClient.sendMessageOnClientFd(msg);
+			return; //! Channel doesn't exist
+		}
+		if (channel->getClient(myClient.getNickName()) == NULL)
 		{
 			std::string msg = ":ft_irc 442 " + myClient.getNickName() + " " + target + " :You're not on that channel";
 			myClient.sendMessageOnClientFd(msg);
 			return; //! Client not in channel
 		}
-		try
-		{
-			getChannel(target).sendChannelMessage(myClient, formattedMsg);
-		}
-		catch (std::exception &e)
-		{
-			std::string msg = ":ft_irc 401 " + myClient.getNickName() + " " + target + " :No such channel";
-			myClient.sendMessageOnClientFd(msg);
-		}
+		channel->sendChannelMessage(myClient, formattedMsg);
+		channel->getBot().handleMessage(&myClient, channel, message);
 	}
 	else
 	{

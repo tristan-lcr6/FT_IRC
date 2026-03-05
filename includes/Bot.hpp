@@ -11,6 +11,7 @@ class Bot
 {
 private:
     std::string _name;
+    bool _activ;
     std::vector<std::string> _weatherStr;
     std::vector<std::string> _insultStr;
 
@@ -23,6 +24,8 @@ public:
     void handleMessage(Client *cli, Channel *channel, std::string message);
     void sendWeather(Channel *channel);
     void sendInsult(Client *cli, Channel *channel);
+    bool getActiv();
+    void switchActiv();
 };
 
 #endif

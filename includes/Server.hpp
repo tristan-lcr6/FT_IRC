@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/05 13:29:13 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/05 16:19:17 by tlecuyer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ public:
     void cmdTopic(Client &cli, std::string cmd);
     void cmdPrivMsg(Client &cli, std::string cmd);
     void cmdQuit(Client &cli, std::string cmd);
+    void cmdBot(Client &cli, std::string cmd);
     void clearEmptyChannel(void);
 
     // ************************************************************************** //

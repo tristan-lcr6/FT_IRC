@@ -10,6 +10,16 @@ void Server::cmdCap(Client &cli, std::string cmd)
 	}
 	return; // We don't support CAP so we ignore
 }
+void Server::cmdBot(Client &cli, std::string cmd)
+{
+	std::string channelName;
+	std::vector<std::string> tokens = split(cmd, ' ');
+	if (tokens.size() > 1 && tokens[1][0] == '#')
+		channelName = tokens[1];
+	getChannel(channelName).botActiv();
+	std::string msg = ":" + cli.getPrefix() + "uses command 'BOT'.";
+	getChannel(channelName).sendChannelMessage(cli, msg);
+}
 
 void Server::cmdQuit(Client &cli, std::string cmd)
 {
