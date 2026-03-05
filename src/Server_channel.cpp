@@ -22,18 +22,25 @@ void Server::JoinMessage(Channel *channel, Client &cli)
 
 void Server::cmdBot(Client &cli, std::string cmd)
 {
-	std::string channelName;
-	Channel *channel;
+	std::string nick = cli.getNickName();
 	std::vector<std::string> tokens = split(cmd, ' ');
+	if (tokens.size() < 2)
+	{
+		std::string msg = ":ft_irc 461 " + nick + " BOT :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
+		return;
+	}
+	std::string channelName = tokens[1];
+	Channel *channel;
 	if (!this->isAlreadyChannel(&channel, channelName))
 	{
-		std::string msg = ":ft_irc 403 " + cli.getNickName() + " " + channelName + " :No such channel";
+		std::string msg = ":ft_irc 403 " + nick + " " + channelName + " :No such channel";
 		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
-	if (channel->getClient(cli.getNickName()) == NULL)
+	if (channel->getClient(nick) == NULL)
 	{
-		std::string msg = ":ft_irc 442 " + cli.getNickName() + " " + channelName + " :You're not on that channel";
+		std::string msg = ":ft_irc 442 " + nick + " " + channelName + " :You're not on that channel";
 		cli.sendMessageOnClientFd(msg);
 		return; //! Client not in channel
 	}
