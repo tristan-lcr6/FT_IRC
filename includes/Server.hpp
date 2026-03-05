@@ -6,7 +6,7 @@
 /*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/04 18:22:49 by jferrand         ###   ########.fr       */
+/*   Updated: 2026/03/05 12:46:08 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,7 @@ public:
     // Server_Channel.cpp
     // ************************************************************************** //
     void cmdNames(Client &cli, std::string cmd);
+    void cmdWho(Client &cli, std::string cmd);
     void cmdJoin(Client &cli, std::string cmd);
     void JoinMessage(Channel *channel, Client &cli);
     void cmdMode(Client &cli, std::string cmd);

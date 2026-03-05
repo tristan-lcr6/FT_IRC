@@ -131,14 +131,8 @@ void Server::clearEmptyChannel(void)
 	while (it != _channels.end())
 	{
 		if ((*it)->getClientsSize() == 0)
-		{
-			std::cout << "Deleting empty channel : " << (*it)->getName() << std::endl;
 			it = _channels.erase(it);
-			// return; //!
-		}
 		else
-		{
 			it++;
-		}
 	}
 }
