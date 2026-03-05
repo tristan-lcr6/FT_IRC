@@ -61,14 +61,16 @@ void Server::execute(Client &cli, std::string cmd)
 		if (!this->_password.empty() && cli.getAuthStatus() == 0 && cmdIdx != 0 // CAP
 			&& cmdIdx != 1)														// PASS
 		{
-			std::cerr << "Error: authentication required" << std::endl;
+			std::string msg = ":ft_irc 464 " + cli.getNickName() + " :Password incorrect";
+			cli.sendMessageOnClientFd(msg);
 			return;
 		}
 
 		// If not fully registered, only allow PASS/NICK/USER/CAP
 		if (cli.getAuthStatus() < 2 && cmdIdx > 3)
 		{
-			std::cerr << "Error: client not registered yet" << std::endl;
+			std::string msg = ":ft_irc 451 " + cli.getNickName() + " :You have not registered";
+			cli.sendMessageOnClientFd(msg);
 			return;
 		}
 
