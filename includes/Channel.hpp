@@ -59,6 +59,7 @@ public:
 	bool join(Client &cli, std::string pwd); // checks if the client can join and the password is right and adds it to the clients list
 	void kick(Client &cli);
 	void clearClientInChannel(Client *myClient);
+	void who(Client &cli);
 
 	// ************************************************************************** //
 	// Operator management

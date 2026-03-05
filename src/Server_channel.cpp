@@ -41,6 +41,51 @@ void Server::cmdNames(Client &cli, std::string cmd)
 	cli.sendMessageOnClientFd(":ft_irc 366 " + nick + " " + channel_name + " :End of /NAMES list");
 }
 
+// WHO <mask>
+// mask = channel or nick
+// prints ":server 352 <requester> <channel> <user> <host> <server> <nick> <flags> :<hopcount> <realname>"
+// for each user in the channel or just the nick
+void Server::cmdWho(Client &cli, std::string cmd)
+{
+	std::vector<std::string> tokens = split(cmd, ' ');
+	std::string nick = cli.getNickName();
+	if (tokens.size() < 2)
+	{
+		std::string msg = ":ft_irc 461 " + nick + " WHO :Not enough parameters";
+		cli.sendMessageOnClientFd(msg);
+		return ;
+	}
+	std::string mask = tokens[1];
+	if (mask[0] != '#')
+	{
+		for (size_t i = 0; i < this->_clients.size(); i++)
+		{
+			if (mask == this->_clients[i]->getNickName())
+			{
+				std::string msg = ":ft_irc 352 " + nick + " * ";
+				msg += this->_clients[i]->getUserName() + " ";
+				msg += this->_clients[i]->getIp() + " ft_irc ";
+				msg += this->_clients[i]->getNickName() + " H :0 ";
+				msg += this->_clients[i]->getRealName();
+				cli.sendMessageOnClientFd(msg);
+				cli.sendMessageOnClientFd(":ft_irc 315 " + nick + " " + mask + ":End of WHO list");
+				return ;
+			}
+		}
+		std::string msg = ":ft_irc 401 " + nick + " " + mask + " :No such nick";
+		cli.sendMessageOnClientFd(msg);
+		return ;
+	}
+	Channel *channel = NULL;
+	if (!this->isAlreadyChannel(&channel, mask))
+	{
+		std::string msg = ":ft_irc 403 " + nick + " " + mask + " :No such channel";
+		cli.sendMessageOnClientFd(msg);
+		return; //! Channel doesn't exist
+	}
+	channel->who(cli);
+}
+
 // JOIN #a,#b,#c passA,passB,passC
 // If the channel exists and can join, joins it
 // If it doesn't exist create it

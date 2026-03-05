@@ -125,6 +125,26 @@ void Channel::kick(Client &cli)
 	this->removeOperator(&cli);
 }
 
+void Channel::who(Client &cli)
+{
+	std::string nick = cli.getNickName();
+	if (!this->_i_mode || getClient(nick) != NULL)
+	{
+		for (size_t i = 0; i < this->_clients.size(); i++)
+		{
+			std::string msg = ":ft_irc 352 " + nick + " " + this->_name + " ";
+			msg += this->_clients[i]->getUserName() + " ";
+			msg += this->_clients[i]->getIp() + " ft_irc ";
+			msg += this->_clients[i]->getNickName() + " H";
+			if (isOperator(this->_clients[i]->getNickName()))
+				msg += "@";
+			msg += " :0 " + this->_clients[i]->getRealName();
+			cli.sendMessageOnClientFd(msg);
+		}
+	}
+	cli.sendMessageOnClientFd(":ft_irc 315 " + nick + " " + this->_name + ":End of WHO list");
+	return ;
+}
 
 void Channel::clearClientInChannel(Client *myClient)
 {
