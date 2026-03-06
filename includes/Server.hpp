@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlecuyer <tlecuyer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 12:22:56 by jferrand          #+#    #+#             */
-/*   Updated: 2026/03/05 16:19:17 by tlecuyer         ###   ########.fr       */
+/*   Updated: 2026/03/06 13:21:26 by jferrand         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,6 @@
 #define CYAN "\033[96m"
 #define END "\033[0m"
 
-// erreurs: ":<server> <code> <receiver_nick> <params...> :<message>"
-// std::string msg = ":ft_irc 461 " + myClient.getNickName() + " " + cmd + " :Not enough parameters";
-// myClient.sendMessageOnClientFd(msg);
 class Server
 {
 private:
@@ -60,6 +57,7 @@ public:
     // ************************************************************************** //
     //  Server Constructor Destructor
     // ************************************************************************** //
+	
     Server();
     Server(const Server &other);
     Server &operator=(const Server &other);
@@ -68,6 +66,7 @@ public:
     // ************************************************************************** //
     //  Core Server Logic
     // ************************************************************************** //
+
     void serverInit();
     void serSocket();
     void acceptNewClient();
@@ -79,6 +78,7 @@ public:
     // ************************************************************************** //
     // --- Data Management (Server.cpp) ---
     // ************************************************************************** //
+
     void setPort(int port);
     void setPassword(std::string pswd);
     Client *findClientByFd(int fd);
@@ -90,12 +90,14 @@ public:
     // ************************************************************************** //
     // --- Command Execution (Execution.cpp) ---
     // ************************************************************************** //
+
     void execute(Client &cli, std::string cmd);
     void cmdPing(Client &cli, std::string cmd);
 
     // ************************************************************************** //
     // --- IRC Commands (Dossier commands/) ---
     // ************************************************************************** //
+
     void cmdCap(Client &cli, std::string cmd);
     void cmdPass(Client &cli, std::string cmd);
     void cmdNick(Client &cli, std::string cmd);
@@ -104,6 +106,7 @@ public:
     // ************************************************************************** //
     // Server_Channel.cpp
     // ************************************************************************** //
+
     void cmdNames(Client &cli, std::string cmd);
     void cmdWho(Client &cli, std::string cmd);
     void cmdJoin(Client &cli, std::string cmd);
@@ -121,6 +124,7 @@ public:
     // ************************************************************************** //
     // --- Exceptions ---
     // ************************************************************************** //
+
     class ServerException : public std::exception
     {
     private:

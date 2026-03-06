@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel_client-op.cpp                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:24:24 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:24:25 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Channel.hpp"
 #include "Client.hpp"
 
@@ -37,8 +49,7 @@ Client *Channel::getClient(std::string nick)
 		if (this->_clients[i]->getNickName() == nick)
 			return (this->_clients[i]);
 	}
-	// std::cerr << "Client " << nick << " not found in channel " << this->_name << std::endl;//!message d'erreur print auqnd nick est appele par broadcast nick
-	return (NULL); //! Error client not found j'arrive pas a renvoyer NULL
+	return (NULL); //! client not found
 }
 
 bool Channel::join(Client &cli)

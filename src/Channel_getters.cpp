@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel_getters.cpp                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:24:28 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:24:30 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Channel.hpp"
 #include "Client.hpp"
-
 
 bool Channel::isInviteOnly(void) const
 {
@@ -76,7 +87,6 @@ bool Channel::isOperator(std::string nick) const
 	}
 	return (false);
 }
-
 
 Bot &Channel::getBot()
 {

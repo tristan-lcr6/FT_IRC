@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_data_managment.cpp                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:23:29 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:23:38 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "Server.hpp"
 
@@ -34,10 +45,8 @@ int Server::findFdByNickName(std::string nickName)
 
 Channel &Server::getChannel(std::string Channelname)
 {
-	// std::cout << "Channelname " << Channelname << std::endl;
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		// std::cout << _channels[i] << std::endl; //!
 		if (_channels[i]->getName() == Channelname)
 		{
 			return (*_channels[i]);

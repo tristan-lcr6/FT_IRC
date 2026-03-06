@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel_mode.cpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:24:44 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:24:52 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Channel.hpp"
 #include "Client.hpp"
-
 
 bool Channel::modeWithParam(char c, bool add)
 {
@@ -87,37 +98,4 @@ void Channel::applyMode(Client &cli, char c, bool add, std::string param)
 	msg += " " + param;
 	cli.sendMessageOnClientFd(msg);
 	this->sendChannelMessage(cli, msg);
-}
-
-std::ostream &operator<<(std::ostream &os, const Channel &channel)
-{
-	os << "========== CHANNEL DEBUG ==========" << std::endl;
-	os << "Name     : " << channel.getName() << std::endl;
-	os << "Topic    : " << channel.getTopic() << std::endl;
-	os << "Modes    : "
-	   << (channel.isInviteOnly() ? "i" : "")
-	   << (channel.isTopicOpOnly() ? "t" : "")
-	   << (channel.hasKey() ? "k" : "")
-	   << (channel.isLimited() ? "l" : "") << std::endl;
-
-	os << "Clients (Addresses) [" << channel._clients.size() << "]: " << std::endl;
-	for (size_t i = 0; i < channel._clients.size(); ++i)
-	{
-		os << "  - " << channel._clients[i] << " (Nick: " << channel._clients[i]->getNickName() << ")" << std::endl;
-	}
-
-	os << "Operators (Addresses) [" << channel._operators.size() << "]: " << std::endl;
-	for (size_t i = 0; i < channel._operators.size(); ++i)
-	{
-		os << "  - " << channel._operators[i] << std::endl;
-	}
-
-	os << "Invite List (Addresses) [" << channel._invite_list.size() << "]: " << std::endl;
-	for (size_t i = 0; i < channel._invite_list.size(); ++i)
-	{
-		os << "  - " << channel._invite_list[i] << std::endl;
-	}
-
-	os << "====================================";
-	return os;
 }

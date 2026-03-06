@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client_setters.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:25:21 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:25:22 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Client.hpp"
 
 int Client::setFd(int fd)
@@ -20,6 +32,7 @@ void Client::setGrade(int i)
 {
 	this->_authStatus = i;
 }
+
 void Client::setToClean(int setVal)
 {
 	_toClean = setVal;

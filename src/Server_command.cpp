@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_command.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:19:54 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:23:02 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 
 void Server::cmdCap(Client &cli, std::string cmd)
@@ -10,8 +22,6 @@ void Server::cmdCap(Client &cli, std::string cmd)
 	}
 	return; // We don't support CAP so we ignore
 }
-
-
 
 void Server::cmdQuit(Client &cli, std::string cmd)
 {
@@ -141,5 +151,22 @@ void Server::clearEmptyChannel(void)
 		}
 		else
 			it++;
+	}
+}
+
+void Server::cmdPing(Client &cli, std::string cmd)
+{
+	std::vector<std::string> tokens = split(cmd, " ");
+	if (tokens[0] == "PING")
+	{
+		if (tokens.size() < 2)
+		{
+			std::string msg = ":ft_irc 461 " + cli.getNickName() + " PING :Not enough parameters";
+			cli.sendMessageOnClientFd(msg);
+			return;
+		}
+		std::string param = tokens[1];
+		std::string response = ":ft_irc PONG :" + param + "\r\n";
+		cli.sendMessageOnClientFd(response);
 	}
 }

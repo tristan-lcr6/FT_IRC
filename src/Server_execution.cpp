@@ -1,9 +1,16 @@
-#include "Server.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_execution.cpp                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:23:41 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:24:03 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// void Server::addToBuff(std::string data, Client &myClient)
-// {
-// 	myClient.addBuff(data);
-// }
+#include "Server.hpp"
 
 static int parse(std::string cmd)
 {
@@ -93,21 +100,5 @@ void Server::execute(Client &cli, std::string cmd)
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
-	}
-}
-
-void Server::cmdPing(Client &cli, std::string cmd)
-{
-	std::vector<std::string> tokens = split(cmd, " ");
-	if (tokens[0] == "PING")
-	{
-		if (tokens.size() < 2)
-		{
-			// Erreur : pas assez de paramètres (461)
-			return;
-		}
-		std::string param = tokens[1];
-		std::string response = ":ft_irc.fr PONG :" + param + "\r\n";
-		cli.sendMessageOnClientFd(response);
 	}
 }

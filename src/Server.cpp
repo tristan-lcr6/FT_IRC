@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:24:09 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:24:12 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
 
 bool Server::_signal = false;
@@ -51,20 +63,4 @@ bool isValidString(const std::string &str)
 		}
 	}
 	return (true);
-}
-
-
-std::ostream &operator<<(std::ostream &dataStream, const std::vector<std::string> &vector)
-{
-	dataStream << "[";
-	for (size_t i = 0; i < vector.size(); ++i)
-	{
-		dataStream << vector[i];
-		if (i != vector.size() - 1)
-		{
-			dataStream << ", ";
-		}
-	}
-	dataStream << "]";
-	return dataStream;
 }

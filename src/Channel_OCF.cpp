@@ -1,7 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel_OCF.cpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:24:55 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:24:56 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Bot.hpp"
-
 
 // Default constructor
 Channel::Channel(void) : _name("#default"), _i_mode(false), _t_mode(false), _k_mode(false), _l_mode(false), _bot("SuperWeatherBot")

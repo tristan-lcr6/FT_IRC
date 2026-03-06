@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client_OCF.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:25:09 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:25:11 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Client.hpp"
 
 Client::Client() : _authStatus(0),  _toClean(0), _nickName("*")
@@ -32,8 +44,6 @@ Client &Client::operator=(const Client &other)
 		this->_realName = other.getRealName();
 		this->_IP = other.getIp();
 		this->_toClean = other._toClean;
-
-
 	}
 	return (*this);
 }

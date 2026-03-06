@@ -1,6 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_channel.cpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:18:51 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:19:48 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "Server.hpp"
-#define CYAN "\033[96m"
-#define END "\033[0m"
 
 void Server::JoinMessage(Channel *channel, Client &cli)
 {
@@ -53,7 +63,7 @@ void Server::cmdBot(Client &cli, std::string cmd)
 	getChannel(channelName).sendChannelMessageBot(message);
 }
 
-// NAMES [channel]
+// NAMES <channel>
 // prints all the clients of the channel
 void Server::cmdNames(Client &cli, std::string cmd)
 {
@@ -298,7 +308,6 @@ void Server::cmdKick(Client &cli, std::string cmd)
 		cli.sendMessageOnClientFd(msg);
 		return; //! Channel doesn't exist
 	}
-	// std::cout << channel << " channel contain :  -------------------\n" <<  *channel << std::endl;
 	if (channel->getClient(cli.getNickName()) == NULL || !channel->isOperator(cli.getNickName()))
 	{
 		std::string msg = ":ft_irc 482 " + cli.getNickName() + " " + channel_name + " :You're not channel operator";
@@ -317,21 +326,7 @@ void Server::cmdKick(Client &cli, std::string cmd)
 	cli.sendMessageOnClientFd(msg);
 	channel->sendChannelMessage(cli, msg);
 	channel->kick(*channel->getClient(nick));
-	std::cout << nick << " kicked succesfully" << std::endl;
 }
-
-// Channel &Server::getChannel(std::string Channelname)
-// {
-// 	for (size_t i = 0; i < _channels.size();i++)
-// 	{
-// 		if(_channels[i].getName() == Channelname)
-// 		{
-// 			return (_channels[i]);
-// 		}
-// 	}
-// 	std::cout << "Error :could not find channel named "<< Channelname << std::endl;
-// 	return (_channels[0]);//! throw exception instead
-// }
 
 // INVITE <nick> <channel>
 // si le channel est invite-only seulement un operateur peut inviter
@@ -452,16 +447,6 @@ void Server::cmdTopic(Client &cli, std::string cmd)
 	channel->sendChannelMessage(cli, msg);
 	cli.sendMessageOnClientFd(msg);
 }
-
-// static std::vector<std::string> GetTokens(std::string cpy, std::string &final)
-// {
-// 	size_t colonPos = cpy.find(":");
-// 	if (colonPos == std::string::npos)
-// 		return split(cpy, " ");
-// 	final = cpy.substr(colonPos + 1);
-// 	std::string header = cpy.substr(0, colonPos);
-// 	return split(header, " ");
-// }
 
 void Server::cmdPrivMsg(Client &myClient, std::string cmd)
 {

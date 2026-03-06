@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel.hpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:26:03 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:26:05 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
@@ -8,7 +20,7 @@
 #include <sstream>
 #include <ctime>
 
-class client;
+class Client;
 class Channel
 {
 private:
@@ -106,8 +118,6 @@ public:
 	// ************************************************************************** //
 	void sendChannelMessage(Client &myClient, std::string message); // sen message to all client in named channel
 	void sendChannelMessageBot(std::string message);				// send message by bot to all client in named channel
-
-	friend std::ostream &operator<<(std::ostream &os, const Channel &channel);
 };
 
 #include <iostream>

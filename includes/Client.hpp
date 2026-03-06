@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:25:58 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:26:00 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
@@ -89,9 +101,5 @@ public:
 		}
 	};
 };
-
-std::ostream &operator<<(std::ostream &os, const Client &c);
-
-std::ostream &operator<<(std::ostream &dataStream, const std::vector<std::string> &vector);
 
 #endif

@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server_core.cpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jferrand <jferrand@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/06 13:20:24 by jferrand          #+#    #+#             */
+/*   Updated: 2026/03/06 13:20:28 by jferrand         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "Server.hpp"
 
@@ -69,12 +80,12 @@ void Server::acceptNewClient()
 	incofd = accept(this->_serSocketFd, (sockaddr *)&(cliadd), &len);
 	if (incofd == -1)
 	{
-		std::cout << "accept() failed" << std::endl;
+		std::cerr << "accept() failed" << std::endl;
 		return;
 	}
 	if (fcntl(incofd, F_SETFL, O_NONBLOCK) == -1)
 	{
-		std::cout << "fcntl() failed" << std::endl;
+		std::cerr << "fcntl() failed" << std::endl;
 		return;
 	}
 	NewPoll.fd = incofd;
@@ -102,8 +113,11 @@ void Server::receiveNewData(int fd)
 		return;
 	}
 
+	std::string received(buff, bytes);
 	// Append received data to client's buffer
-	client->addBuff(std::string(buff, bytes));
+	client->addBuff(received);
+
+	std::cout << BLUE << "Client <" << fd << "> Received: " << received << END << std::endl;
 
 	std::string &buffer = client->getBuffer();
 	size_t pos;
@@ -113,7 +127,7 @@ void Server::receiveNewData(int fd)
 	{
 		std::string line = buffer.substr(0, pos);
 		buffer.erase(0, pos + 2);
-		std::cout << YELLOW << "Client <" << fd << "> Parsed: " << line << END << std::endl;
+		std::cout << YELLOW << "Client <" << fd << "> Executed: " << line << END << std::endl;
 		execute(*client, line);
 	}
 }
@@ -162,8 +176,7 @@ void Server::clearClient(int fd)
 void Server::signalHandler(int signum)
 {
 	(void)signum;
-	std::cout << std::endl
-			  << "Signal Received!" << std::endl;
+	std::cout << std::endl << "Signal Received!" << std::endl;
 	Server::_signal = true;
 }
 
